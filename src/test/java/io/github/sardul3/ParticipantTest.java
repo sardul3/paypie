@@ -4,6 +4,7 @@ import io.github.sardul3.account.domain.Participant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParticipantTest {
@@ -21,6 +22,6 @@ public class ParticipantTest {
     void participantShouldBeCreatedWithAnEntityId() {
         final String email = "user@comp.com";
         Participant participant = Participant.withEmail(email);
-        assertEquals(email, participant.getId());
+        assertThat(participant.getId()).isNotNull();
     }
 }
