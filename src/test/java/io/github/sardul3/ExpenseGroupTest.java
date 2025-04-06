@@ -45,4 +45,11 @@ class ExpenseGroupTest {
                 .contains("Name cannot");
     }
 
+    @Test
+    @DisplayName("Expense Group | names cannot be more than 50 chars")
+    void expenseGroupNameCannotBeMoreThanMaxLengthAllowedTest() {
+        String illegalGroupName = "test-expense-group-random-falcon-with-wings-and-very-good-flight";
+        assertThrows(IllegalArgumentException.class, () -> ExpenseGroup.withName(illegalGroupName));
+    }
+
 }
