@@ -26,11 +26,14 @@ public class ParticipantTest {
     }
 
     @Test
-    void participantEntitiesWithSameValuesAreNotEqual() {
+    @DisplayName("Participant | should be deemed equal if and only if they have same IDs")
+    void participantEntitiesWithSameEmailsAreNotConsideredEqual() {
         final String email = "user@comp.com";
 
         Participant participant = Participant.withEmail(email);
         Participant anotherParticipant = Participant.withEmail(email);
-        assertThat(participant).isEqualTo(anotherParticipant);
+        assertThat(participant).isNotEqualTo(anotherParticipant);
     }
+
+
 }

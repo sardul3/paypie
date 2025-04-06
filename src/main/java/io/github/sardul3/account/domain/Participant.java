@@ -29,11 +29,11 @@ public class Participant {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Participant that = (Participant) o;
-        return Objects.equals(participantEmail, that.participantEmail);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(participantEmail);
+        return Objects.hashCode(id);
     }
 }
