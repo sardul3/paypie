@@ -4,6 +4,8 @@ import io.github.sardul3.account.domain.Participant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,6 +35,12 @@ public class ParticipantTest {
         Participant participant = Participant.withEmail(email);
         Participant anotherParticipant = Participant.withEmail(email);
         assertThat(participant).isNotEqualTo(anotherParticipant);
+    }
+
+    void newlyCreatedParticipantShouldStartWithZeroBalance() {
+        final String email = "user@comp.com";
+        Participant participant = Participant.withEmail(email);
+        assertEquals(BigDecimal.ZERO, participant.getBalance());
     }
 
 
