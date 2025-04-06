@@ -46,10 +46,19 @@ class GroupNameTest {
     }
 
     @Test
-    @DisplayName("Expense Group | names cannot be more than 50 chars")
+    @DisplayName("Expense Group | names cannot be more than allowed chars limit")
     void expenseGroupNameNameCannotBeMoreThanMaxLengthAllowedTest() {
-        String illegalGroupName = "test-expense-group-random-falcon-with-wings-and-very-good-flight";
+        final int MAX_ALLOWED_CHAR_LIMIT = 50;
+        String illegalGroupName = "t".repeat(MAX_ALLOWED_CHAR_LIMIT + 1);
         assertThrows(IllegalArgumentException.class, () -> GroupName.withName(illegalGroupName));
+    }
+
+    @Test
+    @DisplayName("Expense Group | name of exactly 50 characters should be allowed")
+    void groupNameExactlyAtLimitShouldBeAllowedTest() {
+        String nameAtLimit = "a".repeat(50);
+        GroupName groupName = GroupName.withName(nameAtLimit);
+        assertEquals(nameAtLimit, groupName.getName());
     }
 
     @Test
@@ -96,4 +105,36 @@ class GroupNameTest {
 
         assertEquals(expenseGroupName, anotherExpenseGroupName);
     }
+
+    @Test
+    @DisplayName("Expense Group | toString() should include normalized name")
+    void expenseGroupNameToStringShouldIncludeNormalizedNameTest() {
+        String rawInput = "  test-expense-group  ";
+        String expectedNormalized = rawInput.trim();
+
+        GroupName groupName = GroupName.withName(rawInput);
+
+        String toStringOutput = groupName.toString();
+
+        assertThat(toStringOutput)
+                .contains(expectedNormalized)
+                .doesNotContain("  ") // optional: ensure raw spaces are not present
+                .startsWith("GroupName{")
+                .contains("name='" + expectedNormalized + "'");
+    }
+
+    @Test
+    @DisplayName("Expense Group | getName() returns a copy-safe, immutable string")
+    void expenseGroupNameShouldBeImmutableViaGetterTest() {
+        String rawInput = "  test-expense-group  ";
+        GroupName groupName = GroupName.withName(rawInput);
+
+        String original = groupName.getName();
+        String modified = original + "-hacked";
+
+        // Ensure internal state is not affected
+        assertThat(groupName.getName()).isEqualTo(original);
+        assertThat(groupName.getName()).doesNotContain("hacked");
+    }
+
 }
