@@ -4,6 +4,9 @@ public class ExpenseGroup {
     private final String name;
 
     public ExpenseGroup(String name) {
+        if(name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be null or empty");
+        }
         this.name = name;
     }
 
