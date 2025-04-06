@@ -2,6 +2,10 @@ package io.github.sardul3.account.domain;
 
 import java.util.Objects;
 
+@ValueObject(
+        description = "Represents a valid and normalized group name for expense tracking",
+        boundedContext = "expense-management"
+)
 public class GroupName {
     private static final int MAX_GROUP_NAME_LENGTH_LIMIT = 50;
 
