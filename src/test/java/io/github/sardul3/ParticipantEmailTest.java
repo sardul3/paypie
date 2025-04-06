@@ -48,4 +48,14 @@ public class ParticipantEmailTest {
         assertThrows(IllegalArgumentException.class, () -> ParticipantEmail.of(null));
     }
 
+    @Test
+    @DisplayName("Participant Email | should be considered same if their values are equal")
+    void participantEmailShouldBeEqualIfValuesAreSame() {
+        final String emailAddress = "user@test.com";
+        ParticipantEmail participantEmail = ParticipantEmail.of(emailAddress);
+        ParticipantEmail anotherParticipantEmail = ParticipantEmail.of(emailAddress);
+
+        assertEquals(participantEmail, anotherParticipantEmail);
+    }
+
 }
