@@ -1,5 +1,7 @@
 package io.github.sardul3.account.domain;
 
+import java.util.Objects;
+
 public class GroupName {
     private static final int MAX_GROUP_NAME_LENGTH_LIMIT = 50;
 
@@ -23,5 +25,18 @@ public class GroupName {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupName groupName = (GroupName) o;
+        return Objects.equals(name, groupName.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }
