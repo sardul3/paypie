@@ -9,6 +9,9 @@ import java.util.Objects;
 public class ParticipantEmail {
     private final String email;
 
+    private static final String EMAIL_REGEX =
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
     private ParticipantEmail(String email) {
         if(email == null) {
             throw new IllegalArgumentException("Email cannot be null");
@@ -41,6 +44,13 @@ public class ParticipantEmail {
         return Objects.hashCode(email);
     }
 
+    @Override
+    public String toString() {
+        return "ParticipantEmail{" +
+                "email='" + email + '\'' +
+                '}';
+    }
+
     private static boolean isValid(String email) {
         if (email.isEmpty()) return false;
 
@@ -48,6 +58,6 @@ public class ParticipantEmail {
         // - Starts with alphanumeric characters (including + _ . -)
         // - Followed by @
         // - Followed by domain (letters, digits, dots and hyphens)
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        return email.matches(EMAIL_REGEX);
     }
 }

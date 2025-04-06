@@ -7,8 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParticipantEmailTest {
 
@@ -21,7 +20,12 @@ public class ParticipantEmailTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"useR@gmail.com", "USer@gmail.com", "user@Gmail.com", "user@GMAIL.COM"})
+    @ValueSource(strings = {
+            "useR@gmail.com",
+            "USer@gmail.com",
+            "user@Gmail.com",
+            "user@GMAIL.COM"
+    })
     @DisplayName("Participant Email | should be normalized to lowercase")
     public void participantEmailShouldBeNormalizedToLower(String emailAddress) {
         final String expectedNormalizedEmail = emailAddress.toLowerCase();
@@ -57,5 +61,43 @@ public class ParticipantEmailTest {
 
         assertEquals(participantEmail, anotherParticipantEmail);
     }
+
+    @Test
+    @DisplayName("Participant Email | different emails should not be equal")
+    void participantEmailsShouldNotBeEqualIfDifferent() {
+        ParticipantEmail email1 = ParticipantEmail.of("a@x.com");
+        ParticipantEmail email2 = ParticipantEmail.of("b@x.com");
+
+        assertNotEquals(email1, email2);
+    }
+
+    @Test
+    @DisplayName("Participant Email | toString() should return normalized email value")
+    void toStringShouldReturnNormalizedEmailValue() {
+        String rawEmail = "USER@Test.COM";
+        ParticipantEmail participantEmail = ParticipantEmail.of(rawEmail);
+
+        String toStringOutput = participantEmail.toString();
+        assertThat(toStringOutput)
+                .contains("user@test.com") // Assuming toString() is just `return email;`
+                .doesNotContain("USER")
+                .doesNotContain(" ")
+                .contains("@test.com");
+    }
+
+    @Test
+    @DisplayName("Participant Email | getEmail() should be immutable and copy-safe")
+    void getEmailShouldReturnImmutableValue() {
+        String rawEmail = "user@example.com";
+        ParticipantEmail participantEmail = ParticipantEmail.of(rawEmail);
+
+        String original = participantEmail.getEmail();
+        String hacked = original + "-spoofed";
+
+        // Ensure internal state is untouched
+        assertEquals("user@example.com", participantEmail.getEmail());
+        assertThat(participantEmail.getEmail()).doesNotContain("spoofed");
+    }
+
 
 }
