@@ -24,4 +24,13 @@ public class ParticipantTest {
         Participant participant = Participant.withEmail(email);
         assertThat(participant.getId()).isNotNull();
     }
+
+    @Test
+    void participantEntitiesWithSameValuesAreNotEqual() {
+        final String email = "user@comp.com";
+
+        Participant participant = Participant.withEmail(email);
+        Participant anotherParticipant = Participant.withEmail(email);
+        assertThat(participant).isEqualTo(anotherParticipant);
+    }
 }
