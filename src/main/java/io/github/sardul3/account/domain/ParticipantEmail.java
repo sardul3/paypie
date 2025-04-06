@@ -2,6 +2,10 @@ package io.github.sardul3.account.domain;
 
 import java.util.Objects;
 
+@ValueObject(
+        description = "Represents a valid and lower-cased email for the participant",
+        boundedContext = "expense-management"
+)
 public class ParticipantEmail {
     private final String email;
 
