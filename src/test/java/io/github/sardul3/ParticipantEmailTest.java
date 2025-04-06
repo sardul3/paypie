@@ -40,8 +40,7 @@ public class ParticipantEmailTest {
 
         assertThat(exception.getMessage())
                 .isNotBlank()
-                .contains("Invalid email format".toLowerCase());
-
+                .contains("Invalid email format");
     }
 
 }
