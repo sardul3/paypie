@@ -3,6 +3,7 @@ package io.github.sardul3;
 import io.github.sardul3.account.domain.ExpenseGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperties;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -50,6 +51,17 @@ class ExpenseGroupTest {
     void expenseGroupNameCannotBeMoreThanMaxLengthAllowedTest() {
         String illegalGroupName = "test-expense-group-random-falcon-with-wings-and-very-good-flight";
         assertThrows(IllegalArgumentException.class, () -> ExpenseGroup.withName(illegalGroupName));
+    }
+
+    @Test
+    @DisplayName("Expense Group | names cannot have trailing spaces")
+    void expenseGroupNameShouldNotContainTrailingSpacesTest() {
+        String groupName = "test-expense-group ";
+        String groupNameWithoutSpaces = groupName.substring(0, groupName.length() - 1);
+
+        ExpenseGroup expenseGroup = ExpenseGroup.withName(groupName);
+        assertEquals(groupNameWithoutSpaces, expenseGroup.getName());
+        assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
     }
 
 }
