@@ -42,5 +42,10 @@ public class ParticipantEmailTest {
                 .isNotBlank()
                 .contains("Invalid email format");
     }
+    @Test
+    @DisplayName("Participant Email | should reject invalid email addresses")
+    void participantEmailShouldNotBeNull() {
+        assertThrows(IllegalArgumentException.class, () -> ParticipantEmail.of(null));
+    }
 
 }

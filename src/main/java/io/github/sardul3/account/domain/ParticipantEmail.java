@@ -1,5 +1,7 @@
 package io.github.sardul3.account.domain;
 
+import java.util.Objects;
+
 public class ParticipantEmail {
     private final String email;
 
