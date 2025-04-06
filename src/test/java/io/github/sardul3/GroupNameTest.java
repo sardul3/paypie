@@ -22,11 +22,11 @@ class GroupNameTest {
 
     @ParameterizedTest
     @DisplayName("Expense Group | should reject invalid empty names")
-    @ValueSource(strings = {"", "   ", "\t", "\n"})
-    void expenseGroupNameShouldNotBeEmptyTest() {
+    @ValueSource(strings = {"", " ", "\t", "\n"})
+    void expenseGroupNameShouldNotBeEmptyTest(String invalidName) {
         IllegalArgumentException exception =
                 assertThrows(IllegalArgumentException.class,
-                        () -> GroupName.withName(""));
+                        () -> GroupName.withName(invalidName));
 
         assertThat(exception.getMessage())
                 .isNotEmpty()
@@ -96,5 +96,4 @@ class GroupNameTest {
 
         assertEquals(expenseGroupName, anotherExpenseGroupName);
     }
-
 }

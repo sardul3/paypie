@@ -12,15 +12,19 @@ public class GroupName {
     private final String name;
 
     public GroupName(String name) {
-        if(name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Name cannot be null or empty");
+        if(name == null ) {
+            throw new IllegalArgumentException("Name cannot be null");
         }
-        if(name.length() > 50) {
+        String trimmedName = name.trim();
+        if(trimmedName.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+        if(trimmedName.length() > 50) {
             throw new IllegalArgumentException(
                     String.format("Name cannot be longer than {} characters",
                             MAX_GROUP_NAME_LENGTH_LIMIT));
         }
-        this.name = name.trim();
+        this.name = trimmedName;
     }
 
     public static GroupName withName(String name) {
@@ -42,5 +46,12 @@ public class GroupName {
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
+    }
+
+    @Override
+    public String toString() {
+        return "GroupName{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }
