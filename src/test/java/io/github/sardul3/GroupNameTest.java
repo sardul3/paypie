@@ -1,9 +1,9 @@
 package io.github.sardul3;
 
 import io.github.sardul3.account.domain.ExpenseGroup;
+import io.github.sardul3.account.domain.GroupName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperties;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -11,13 +11,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class ExpenseGroupTest {
+class GroupNameTest {
 
     @Test
     @DisplayName("Expense Group | should be created without errors")
     void expenseGroupShouldBeCreatedTest() {
         final String GROUP_NAME = "test-expense-group";
-        ExpenseGroup expenseGroup = ExpenseGroup.withName(GROUP_NAME);
+        GroupName expenseGroup = GroupName.withName(GROUP_NAME);
         assertEquals(GROUP_NAME, expenseGroup.getName());
     }
 
@@ -27,7 +27,7 @@ class ExpenseGroupTest {
     void expenseGroupShouldNotBeEmptyTest() {
         IllegalArgumentException exception =
                 assertThrows(IllegalArgumentException.class,
-                        () -> ExpenseGroup.withName(""));
+                        () -> GroupName.withName(""));
 
         assertThat(exception.getMessage())
                 .isNotEmpty()
@@ -39,7 +39,7 @@ class ExpenseGroupTest {
     void expenseGroupShouldNotBeNullTest() {
         IllegalArgumentException exception =
                 assertThrows(IllegalArgumentException.class,
-                        () -> ExpenseGroup.withName(null));
+                        () -> GroupName.withName(null));
 
         assertThat(exception.getMessage())
                 .isNotEmpty()
@@ -50,7 +50,7 @@ class ExpenseGroupTest {
     @DisplayName("Expense Group | names cannot be more than 50 chars")
     void expenseGroupNameCannotBeMoreThanMaxLengthAllowedTest() {
         String illegalGroupName = "test-expense-group-random-falcon-with-wings-and-very-good-flight";
-        assertThrows(IllegalArgumentException.class, () -> ExpenseGroup.withName(illegalGroupName));
+        assertThrows(IllegalArgumentException.class, () -> GroupName.withName(illegalGroupName));
     }
 
     @Test
@@ -59,7 +59,7 @@ class ExpenseGroupTest {
         String groupName = "test-expense-group ";
         String groupNameWithoutSpaces = groupName.substring(0, groupName.length() - 1);
 
-        ExpenseGroup expenseGroup = ExpenseGroup.withName(groupName);
+        GroupName expenseGroup = GroupName.withName(groupName);
         assertEquals(groupNameWithoutSpaces, expenseGroup.getName());
         assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
     }
@@ -70,7 +70,7 @@ class ExpenseGroupTest {
         String groupName = " test-expense-group";
         String groupNameWithoutSpaces = groupName.substring(1, groupName.length());
 
-        ExpenseGroup expenseGroup = ExpenseGroup.withName(groupName);
+        GroupName expenseGroup = GroupName.withName(groupName);
         assertEquals(groupNameWithoutSpaces, expenseGroup.getName());
         assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
     }
@@ -81,7 +81,7 @@ class ExpenseGroupTest {
         String groupName = " test-expense-group   ";
         String groupNameWithoutSpaces = groupName.trim();
 
-        ExpenseGroup expenseGroup = ExpenseGroup.withName(groupName);
+        GroupName expenseGroup = GroupName.withName(groupName);
         assertEquals(groupNameWithoutSpaces, expenseGroup.getName());
         assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
     }
