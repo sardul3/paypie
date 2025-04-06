@@ -11,7 +11,7 @@ public class GroupName {
 
     private final String name;
 
-    public GroupName(String name) {
+    private GroupName(String name) {
         if(name == null ) {
             throw new IllegalArgumentException("Name cannot be null");
         }
