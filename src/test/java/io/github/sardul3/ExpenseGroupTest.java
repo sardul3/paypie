@@ -64,4 +64,26 @@ class ExpenseGroupTest {
         assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
     }
 
+    @Test
+    @DisplayName("Expense Group | names cannot have leading spaces")
+    void expenseGroupNameShouldNotContainLeadingSpacesTest() {
+        String groupName = " test-expense-group";
+        String groupNameWithoutSpaces = groupName.substring(1, groupName.length());
+
+        ExpenseGroup expenseGroup = ExpenseGroup.withName(groupName);
+        assertEquals(groupNameWithoutSpaces, expenseGroup.getName());
+        assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
+    }
+
+    @Test
+    @DisplayName("Expense Group | names cannot have spaces on either end")
+    void expenseGroupNameShouldNotContainSpacesOnEitherEndTest() {
+        String groupName = " test-expense-group   ";
+        String groupNameWithoutSpaces = groupName.trim();
+
+        ExpenseGroup expenseGroup = ExpenseGroup.withName(groupName);
+        assertEquals(groupNameWithoutSpaces, expenseGroup.getName());
+        assertEquals(groupNameWithoutSpaces.length(), expenseGroup.getName().length());
+    }
+
 }

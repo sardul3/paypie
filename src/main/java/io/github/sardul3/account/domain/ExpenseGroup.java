@@ -15,7 +15,7 @@ public class ExpenseGroup {
                     String.format("Name cannot be longer than {} characters",
                             MAX_GROUP_NAME_LENGTH_LIMIT));
         }
-        this.name = name;
+        this.name = name.trim();
     }
 
     public static ExpenseGroup withName(String name) {
