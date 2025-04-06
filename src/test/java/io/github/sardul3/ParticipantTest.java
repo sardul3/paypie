@@ -37,6 +37,8 @@ public class ParticipantTest {
         assertThat(participant).isNotEqualTo(anotherParticipant);
     }
 
+    @Test
+    @DisplayName("Participant | new participant should have zero balance")
     void newlyCreatedParticipantShouldStartWithZeroBalance() {
         final String email = "user@comp.com";
         Participant participant = Participant.withEmail(email);

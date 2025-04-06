@@ -1,19 +1,22 @@
 package io.github.sardul3.account.domain;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Participant {
     private final UUID id;
     private final ParticipantEmail participantEmail;
+    private final BigDecimal balance;
 
-    private Participant(UUID id, ParticipantEmail participantEmail) {
+    private Participant(UUID id, ParticipantEmail participantEmail, BigDecimal balance) {
         this.id = id;
         this.participantEmail = participantEmail;
+        this.balance = balance;
     }
 
     public static Participant withEmail(String email) {
-        return new Participant(UUID.randomUUID(), ParticipantEmail.of(email));
+        return new Participant(UUID.randomUUID(), ParticipantEmail.of(email), BigDecimal.ZERO);
     }
 
     public String getEmail() {
@@ -22,6 +25,10 @@ public class Participant {
 
     public UUID getId() {
         return id;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
     }
 
     @Override
