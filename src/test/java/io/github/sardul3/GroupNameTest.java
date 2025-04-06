@@ -104,6 +104,7 @@ class GroupNameTest {
         GroupName anotherExpenseGroupName = GroupName.withName(anotherGroupName);
 
         assertEquals(expenseGroupName, anotherExpenseGroupName);
+        assertEquals(expenseGroupName.hashCode(), anotherExpenseGroupName.hashCode());
     }
 
     @Test

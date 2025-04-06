@@ -60,6 +60,7 @@ public class ParticipantEmailTest {
         ParticipantEmail anotherParticipantEmail = ParticipantEmail.of(emailAddress);
 
         assertEquals(participantEmail, anotherParticipantEmail);
+        assertEquals(participantEmail.hashCode(), anotherParticipantEmail.hashCode());
     }
 
     @Test
@@ -69,6 +70,7 @@ public class ParticipantEmailTest {
         ParticipantEmail email2 = ParticipantEmail.of("b@x.com");
 
         assertNotEquals(email1, email2);
+        assertNotEquals(email1.hashCode(), email2.hashCode());
     }
 
     @Test
