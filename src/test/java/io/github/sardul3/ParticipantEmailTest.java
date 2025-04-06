@@ -1,5 +1,6 @@
 package io.github.sardul3;
 
+import io.github.sardul3.account.domain.ParticipantEmail;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
