@@ -15,4 +15,12 @@ public class ParticipantTest {
         Participant participant = Participant.withEmail(email);
         assertEquals(email, participant.getEmail());
     }
+
+    @Test
+    @DisplayName("Participant | should be created with a new ID as it is an entity")
+    void participantShouldBeCreatedWithAnEntityId() {
+        final String email = "user@comp.com";
+        Participant participant = Participant.withEmail(email);
+        assertEquals(email, participant.getId());
+    }
 }
