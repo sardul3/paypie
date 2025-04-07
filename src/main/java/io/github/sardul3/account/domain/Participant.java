@@ -26,6 +26,10 @@ public class Participant {
         this.balance = this.balance.add(creditMoney);
     }
 
+    public void debit(Money debitMoney) {
+        this.balance = this.balance.subtract(debitMoney);
+    }
+
     public String getEmail() {
         return participantEmail.getEmail();
     }
@@ -50,4 +54,6 @@ public class Participant {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+
 }
