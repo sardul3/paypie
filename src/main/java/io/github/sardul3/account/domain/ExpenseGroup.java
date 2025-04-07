@@ -2,7 +2,6 @@ package io.github.sardul3.account.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
 

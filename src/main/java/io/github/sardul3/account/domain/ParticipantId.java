@@ -14,10 +14,6 @@ public class ParticipantId extends BaseId<UUID>{
         return new ParticipantId(id);
     }
 
-    public static ParticipantId of(UUID id) {
-        return new ParticipantId(id);
-    }
-
     public static ParticipantId generate() {
         return new ParticipantId(UUID.randomUUID());
     }
