@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+@DomainEntity(
+        description = "Represents a participant in an expense group, with balance and email address",
+        boundedContext = "expense-management",
+        isAggregateRoot = false
+)
 public class Participant {
     private final UUID id;
     private final ParticipantEmail participantEmail;
