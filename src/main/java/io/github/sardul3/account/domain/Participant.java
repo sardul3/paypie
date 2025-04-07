@@ -7,16 +7,18 @@ import java.util.UUID;
 public class Participant {
     private final UUID id;
     private final ParticipantEmail participantEmail;
-    private final BigDecimal balance;
+    private final Money balance;
 
-    private Participant(UUID id, ParticipantEmail participantEmail, BigDecimal balance) {
+    private Participant(UUID id, ParticipantEmail participantEmail, Money balance) {
         this.id = id;
         this.participantEmail = participantEmail;
         this.balance = balance;
     }
 
     public static Participant withEmail(String email) {
-        return new Participant(UUID.randomUUID(), ParticipantEmail.of(email), BigDecimal.ZERO);
+        return new Participant(UUID.randomUUID(),
+                ParticipantEmail.of(email),
+                Money.withZeroBalance());
     }
 
     public String getEmail() {
@@ -28,7 +30,7 @@ public class Participant {
     }
 
     public BigDecimal getBalance() {
-        return balance;
+        return balance.getAmount();
     }
 
     @Override

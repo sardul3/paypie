@@ -42,7 +42,7 @@ public class ParticipantTest {
     void newlyCreatedParticipantShouldStartWithZeroBalance() {
         final String email = "user@comp.com";
         Participant participant = Participant.withEmail(email);
-        assertEquals(BigDecimal.ZERO, participant.getBalance());
+        assertEquals(0, participant.getBalance().compareTo(BigDecimal.ZERO));
     }
 
 
