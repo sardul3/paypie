@@ -110,4 +110,39 @@ public class ExpenseGroupTest {
         expenseGroup.addParticipant(participantId);
         assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
     }
+
+    @Test
+    @DisplayName("Expense Group | cannot be activated if it does not have at least 2 members")
+    void expenseGroupCannotBeActivatedBeforeTwoTotalMembers() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("user@example.com");
+
+        ExpenseGroup expenseGroup = ExpenseGroup.from(
+                groupName.getName(), createdBy
+        );
+
+        assertThrows(IllegalStateException.class, () -> expenseGroup.activate());
+    }
+
+    @Test
+    @DisplayName("Expense Group | can be activated if it has at least 2 members")
+    void expenseGroupCannotBeActivatedBeforeTwoTotalMembers() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("user@example.com");
+
+        ExpenseGroup expenseGroup = ExpenseGroup.from(
+                groupName.getName(), createdBy
+        );
+
+        Participant participant = Participant.withEmail("user@example.com");
+        ParticipantId participantId = ParticipantId.from(participant.getId());
+        expenseGroup.addParticipant(participantId);
+        expenseGroup.activate();
+
+        assertThat(expenseGroup.getParticipants().size())
+                .isEqualTo(2);
+
+        assertThat(expenseGroup.isActivated())
+                .isTrue();
+    }
 }
