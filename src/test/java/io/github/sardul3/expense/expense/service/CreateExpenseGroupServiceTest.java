@@ -56,4 +56,18 @@ public class CreateExpenseGroupServiceTest {
 
         assertThrows(ExpenseGroupAlreadyExistsException.class, () -> createExpenseGroupService.createExpenseGroup(createExpenseGroupCommand));
     }
+
+    @Test
+    @DisplayName("CreateExpenseGroupService | usecase should not leak internal domain model to external layers")
+    void testCreateExpenseGroupShouldReturnCustomDto() {
+        CreateExpenseGroupCommand command = new CreateExpenseGroupCommand(
+                "demo", "user@company.com"
+        );
+
+        CreateExpenseGroupResponse response = createExpenseGroupService.createExpenseGroup(command);
+
+        assertThat(response).isNotNull();
+        assertThat(response.name()).isEqualTo("Group One");
+        assertThat(response.groupId()).isNotBlank();
+    }
 }
