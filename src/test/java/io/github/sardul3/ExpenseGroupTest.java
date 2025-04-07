@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("ExpenseGroup | Aggregate Root Behavior")
 public class ExpenseGroupTest {
@@ -64,6 +65,7 @@ public class ExpenseGroupTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should add group creator as a participant by default")
     void expenseGroupShouldAddCreatorAsParticipantByDefault() {
         GroupName groupName = GroupName.withName("demo");
         Participant createdBy = Participant.withEmail("user@example.com");
@@ -77,5 +79,19 @@ public class ExpenseGroupTest {
 
         assertThat(expenseGroup.getParticipants().get(0).getId())
                 .isEqualTo(createdBy.getParticipantId().getId());
+    }
+
+    @Test
+    void expenseGroupShouldNotAddDuplicateParticipants() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("creator@example.com");
+        Participant participant = Participant.withEmail("user@example.com");
+
+        ExpenseGroup expenseGroup = ExpenseGroup.from(
+                groupName.getName(), createdBy
+        );
+
+        ParticipantId participantId = ParticipantId.from(participant.getId());
+        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
     }
 }
