@@ -28,6 +28,9 @@ public class Participant {
 
     public void debit(Money debitMoney) {
         this.balance = this.balance.subtract(debitMoney);
+        if(balance.isNegative()) {
+            throw new IllegalStateException("After debit, the money cannot be negative");
+        }
     }
 
     public String getEmail() {

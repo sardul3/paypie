@@ -60,6 +60,19 @@ public class ParticipantTest {
     }
 
     @Test
+    @DisplayName("Participant | money should be placed with 2 decimal places")
+    void participantMoneyShouldBeUsedWithTwoDecimalPlaces() {
+        final String email = "user@comp.com";
+        final int money = 11;
+        Participant participant = Participant.withEmail(email);
+        Money creditMoney = Money.of(new BigDecimal(money));
+        participant.credit(creditMoney);
+
+        assertThat(participant.getBalance()).isEqualByComparingTo("11.00");
+        assertEquals(0, participant.getBalance().compareTo(BigDecimal.valueOf(money)));
+    }
+
+    @Test
     @DisplayName("Participant | participants should have the ability to perform debit operation")
     void participantShouldBeAbleToDebitAccount() {
         final String email = "user@comp.com";
