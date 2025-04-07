@@ -1,5 +1,6 @@
 package io.github.sardul3.expense.application.usecase;
 
+import io.github.sardul3.expense.application.common.annotation.UseCase;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
@@ -9,6 +10,7 @@ import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 
+@UseCase(description = "Creates a new expense group in the system", inputPort = CreateExpenseGroupUseCase.class)
 public class CreateExpenseGroupService implements CreateExpenseGroupUseCase {
 
     private final ExpenseGroupRepository expenseGroupRepository;
