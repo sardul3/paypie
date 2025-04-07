@@ -21,6 +21,10 @@ public abstract class BaseEntity<ID extends BaseId<?>> {
         return Objects.equals(id, that.id);
     }
 
+    public ID getId() {
+        return id;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(id);

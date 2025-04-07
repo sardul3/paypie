@@ -55,7 +55,7 @@ public class ExpenseGroupTest {
                 groupName.getName(), createdBy
         );
 
-        ParticipantId participantId = ParticipantId.from(participant.getId());
+        ParticipantId participantId = participant.getId();
         expenseGroup.addParticipant(participantId);
 
         assertThat(expenseGroup.getParticipants().size())
@@ -90,7 +90,7 @@ public class ExpenseGroupTest {
                 groupName.getName(), createdBy
         );
 
-        ParticipantId participantId = ParticipantId.from(createdBy.getId());
+        ParticipantId participantId = participant.getId();
         assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
     }
 
@@ -104,7 +104,7 @@ public class ExpenseGroupTest {
                 groupName.getName(), createdBy
         );
 
-        ParticipantId participantId = ParticipantId.from(participant.getId());
+        ParticipantId participantId = participant.getId();
         expenseGroup.addParticipant(participantId);
         assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
     }
@@ -133,7 +133,7 @@ public class ExpenseGroupTest {
         );
 
         Participant participant = Participant.withEmail("user@example.com");
-        ParticipantId participantId = ParticipantId.from(participant.getId());
+        ParticipantId participantId = participant.getId();
         expenseGroup.addParticipant(participantId);
         expenseGroup.activate();
 

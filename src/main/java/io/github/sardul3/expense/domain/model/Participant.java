@@ -53,10 +53,6 @@ public class Participant extends BaseEntity<ParticipantId> {
         return participantEmail.getEmail();
     }
 
-    public UUID getId() {
-        return id.getId();
-    }
-
     public ParticipantId getParticipantId() {
         return id;
     }
