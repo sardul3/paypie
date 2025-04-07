@@ -6,6 +6,8 @@ import io.github.sardul3.account.domain.Participant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("ExpenseGroup | Aggregate Root Behavior")
@@ -40,5 +42,21 @@ public class ExpenseGroupTest {
 
         assertThat(expenseGroup.isActivated())
                 .isFalse();
+    }
+
+    void expenseGroupShouldAllowAdditionalParticipants() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("creator@example.com");
+        Participant participant = Participant.withEmail("user@example.com");
+
+        ExpenseGroup expenseGroup = ExpenseGroup.from(
+                groupName.getName(), createdBy
+        );
+
+        UUID participantId = participant.getId();
+        expenseGroup.addParticipant(participantId);
+
+        assertThat(expenseGroup.getParticipants())
+                .hasSize(2);
     }
 }
