@@ -55,7 +55,7 @@ import java.lang.annotation.*;
  * <ul>
  *   <li>Evans, Eric. <em>Domain-Driven Design: Tackling Complexity in the Heart of Software</em></li>
  *   <li>Vernon, Vaughn. <em>Implementing Domain-Driven Design</em></li>
- *   <li><a href=\"https://dddcommunity.org/\">https://dddcommunity.org/</a></li>
+ *   <li><a href="https://dddcommunity.org/">https://dddcommunity.org/</a></li>
  * </ul>
  */
 @Documented

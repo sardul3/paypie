@@ -65,7 +65,7 @@ public @interface AggregateRoot {
 
     /**
      * Optional description of what this aggregate root manages or protects.
-     *
+     * @return A human-readable description of this aggregate root's responsibility.
      * Example: "Represents a group of participants collaborating on shared expenses"
      */
     String description() default "";
