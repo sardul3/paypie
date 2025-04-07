@@ -90,8 +90,8 @@ public class ExpenseGroupTest {
                 groupName.getName(), createdBy
         );
 
-        ParticipantId participantId = participant.getId();
-        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
+        ParticipantId creatorId = createdBy.getId();
+        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(creatorId));
     }
 
     @Test
