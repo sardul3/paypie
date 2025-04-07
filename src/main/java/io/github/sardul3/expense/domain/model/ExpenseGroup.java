@@ -30,11 +30,10 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         this.participants.add(groupCreator.getParticipantId());
     }
 
-    public static ExpenseGroup from(String groupName, Participant creator) {
-        GroupName group = GroupName.withName(groupName);
+    public static ExpenseGroup from(GroupName groupName, Participant creator) {
         return new ExpenseGroup(
                 ExpenseGroupId.generate(),
-                group,
+                groupName,
                 creator
         );
     }

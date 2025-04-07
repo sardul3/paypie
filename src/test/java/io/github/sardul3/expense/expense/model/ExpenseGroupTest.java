@@ -18,7 +18,7 @@ public class ExpenseGroupTest {
     void expenseGroupShouldBeCreatedWithCorrectName() {
         GroupName groupName = GroupName.withName("demo");
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                "demo",
+                groupName,
                 Participant.withEmail("creator@example.com")
         );
 
@@ -33,7 +33,7 @@ public class ExpenseGroupTest {
         Participant createdBy = Participant.withEmail("creator@example.com");
         Participant participant = Participant.withEmail("user@example.com");
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                "demo", createdBy
+                groupName, createdBy
         );
 
         assertThat(expenseGroup.getGroupName())
@@ -52,7 +52,7 @@ public class ExpenseGroupTest {
         Participant participant = Participant.withEmail("user@example.com");
 
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                groupName.getName(), createdBy
+                groupName, createdBy
         );
 
         ParticipantId participantId = participant.getId();
@@ -69,7 +69,7 @@ public class ExpenseGroupTest {
         Participant createdBy = Participant.withEmail("user@example.com");
 
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                groupName.getName(), createdBy
+                groupName, createdBy
         );
 
         assertThat(expenseGroup.getParticipants().size())
@@ -87,7 +87,7 @@ public class ExpenseGroupTest {
         Participant participant = Participant.withEmail("user@example.com");
 
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                groupName.getName(), createdBy
+                groupName, createdBy
         );
 
         ParticipantId creatorId = createdBy.getId();
@@ -101,7 +101,7 @@ public class ExpenseGroupTest {
         Participant createdBy = Participant.withEmail("creator@example.com");
         Participant participant = Participant.withEmail("user@example.com");
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                groupName.getName(), createdBy
+                groupName, createdBy
         );
 
         ParticipantId participantId = participant.getId();
@@ -116,7 +116,7 @@ public class ExpenseGroupTest {
         Participant createdBy = Participant.withEmail("user@example.com");
 
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                groupName.getName(), createdBy
+                groupName, createdBy
         );
 
         assertThrows(IllegalStateException.class, () -> expenseGroup.activate());
@@ -129,7 +129,7 @@ public class ExpenseGroupTest {
         Participant createdBy = Participant.withEmail("user@example.com");
 
         ExpenseGroup expenseGroup = ExpenseGroup.from(
-                groupName.getName(), createdBy
+                groupName, createdBy
         );
 
         Participant participant = Participant.withEmail("user@example.com");
