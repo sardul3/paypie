@@ -59,4 +59,12 @@ public class Participant {
     }
 
 
+    @Override
+    public String toString() {
+        return "Participant{" +
+                "id=" + id +
+                ", participantEmail=" + participantEmail +
+                ", balance=" + balance +
+                '}';
+    }
 }

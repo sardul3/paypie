@@ -6,9 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParticipantTest {
 
@@ -79,11 +81,19 @@ public class ParticipantTest {
         final int money = 11;
         Participant participant = Participant.withEmail(email);
         Money creditMoney = Money.of(new BigDecimal(money));
+        participant.credit(creditMoney);
         participant.debit(creditMoney);
 
-        assertThat(participant.getBalance()).isEqualByComparingTo("-11.00");
+        assertThat(participant.getBalance()).isEqualByComparingTo("0");
     }
 
-
-
+    @Test
+    @DisplayName("Participant | participants cannot debit if it results in negative amount")
+    void participantShouldNotBeAbleToDebitAccountIfItLeadsToNegativeAmount() {
+        final String email = "user@comp.com";
+        final int money = 11;
+        Participant participant = Participant.withEmail(email);
+        Money creditMoney = Money.of(new BigDecimal(money));
+        assertThrows(IllegalStateException.class, () -> participant.debit(creditMoney));
+    }
 }
