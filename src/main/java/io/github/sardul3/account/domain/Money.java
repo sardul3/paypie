@@ -8,11 +8,12 @@ import java.util.Objects;
 
 public class Money {
     private static final int MONEY_SCALE_DECIMAL_PLACES = 2;
-    private BigDecimal amount;
+
+    private final BigDecimal amount;
 
     private Money(BigDecimal amount) {
-        Objects.nonNull(amount);
-        this.amount = amount.setScale(MONEY_SCALE_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP);
+        this.amount = Objects.requireNonNull(amount, "Amount cannot be null")
+                .setScale(MONEY_SCALE_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP);
     }
 
     public static Money of(BigDecimal amount) {
@@ -35,10 +36,6 @@ public class Money {
 
     public boolean isNegative() {
         return this.amount.compareTo(BigDecimal.ZERO) < 0;
-    }
-
-    public void deduct(BigDecimal amount) {
-        this.amount.subtract(amount);
     }
 
     public BigDecimal getAmount() {
