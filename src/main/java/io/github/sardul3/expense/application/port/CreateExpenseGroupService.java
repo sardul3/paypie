@@ -11,11 +11,9 @@ import io.github.sardul3.expense.domain.valueobject.GroupName;
 public class CreateExpenseGroupService implements CreateExpenseGroupUseCase {
 
     private final ExpenseGroupRepository expenseGroupRepository;
-    private final ExpenseGroupMapper expenseGroupMapper;
 
-    public CreateExpenseGroupService(ExpenseGroupRepository expenseGroupRepository, ExpenseGroupMapper expenseGroupMapper) {
+    public CreateExpenseGroupService(ExpenseGroupRepository expenseGroupRepository) {
         this.expenseGroupRepository = expenseGroupRepository;
-        this.expenseGroupMapper = expenseGroupMapper;
     }
 
     @Override
