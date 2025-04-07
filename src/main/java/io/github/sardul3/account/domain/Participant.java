@@ -23,10 +23,16 @@ public class Participant {
     }
 
     public void credit(Money creditMoney) {
+        if (creditMoney.isNotPositive()) {
+            throw new IllegalArgumentException("Cannot credit with zero or negative amount");
+        }
         this.balance = this.balance.add(creditMoney);
     }
 
     public void debit(Money debitMoney) {
+        if (debitMoney.isNotPositive()) {
+            throw new IllegalArgumentException("Cannot debit with zero or negative amount");
+        }
         this.balance = this.balance.subtract(debitMoney);
         if(balance.isNegative()) {
             throw new IllegalStateException("After debit, the money cannot be negative");

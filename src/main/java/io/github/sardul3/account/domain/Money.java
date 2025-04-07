@@ -17,6 +17,7 @@ public class Money {
     }
 
     public static Money of(BigDecimal amount) {
+        validateAmount(amount);
         return new Money(amount);
     }
 
@@ -38,15 +39,19 @@ public class Money {
         return this.amount.compareTo(BigDecimal.ZERO) < 0;
     }
 
+    public boolean isNotPositive() {
+        return this.amount.compareTo(BigDecimal.ZERO) <= 0;
+    }
+
     public BigDecimal getAmount() {
         return amount;
     }
 
-    private void validateAmount(BigDecimal amount) {
+    private static void validateAmount(BigDecimal amount) {
         if(amount == null) {
             throw new IllegalArgumentException("Amount cannot be null");
         }
-        if(isNegative()) {
+        if(amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Amount cannot be negative");
         }
     }

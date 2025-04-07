@@ -104,7 +104,7 @@ public class ParticipantTest {
         final int money = 0;
         Participant participant = Participant.withEmail(email);
         Money creditMoney = Money.of(new BigDecimal(money));
-        assertThrows(IllegalStateException.class, () -> participant.credit(creditMoney));
+        assertThrows(IllegalArgumentException.class, () -> participant.credit(creditMoney));
     }
 
     @Test
@@ -114,6 +114,6 @@ public class ParticipantTest {
         final int money = 0;
         Participant participant = Participant.withEmail(email);
         Money creditMoney = Money.of(new BigDecimal(money));
-        assertThrows(IllegalStateException.class, () -> participant.debit(creditMoney));
+        assertThrows(IllegalArgumentException.class, () -> participant.debit(creditMoney));
     }
 }
