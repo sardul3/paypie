@@ -96,4 +96,24 @@ public class ParticipantTest {
         Money creditMoney = Money.of(new BigDecimal(money));
         assertThrows(IllegalStateException.class, () -> participant.debit(creditMoney));
     }
+
+    @Test
+    @DisplayName("Participant | participants cannot credit amount with value ZERO ($0)")
+    void participantShouldNotBeAbleToCreditZeroAmount() {
+        final String email = "user@comp.com";
+        final int money = 0;
+        Participant participant = Participant.withEmail(email);
+        Money creditMoney = Money.of(new BigDecimal(money));
+        assertThrows(IllegalStateException.class, () -> participant.credit(creditMoney));
+    }
+
+    @Test
+    @DisplayName("Participant | participants cannot debit amount with value ZERO ($0)")
+    void participantShouldNotBeAbleToDebitZeroAmount() {
+        final String email = "user@comp.com";
+        final int money = 0;
+        Participant participant = Participant.withEmail(email);
+        Money creditMoney = Money.of(new BigDecimal(money));
+        assertThrows(IllegalStateException.class, () -> participant.debit(creditMoney));
+    }
 }
