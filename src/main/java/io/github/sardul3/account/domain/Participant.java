@@ -51,6 +51,10 @@ public class Participant extends BaseEntity<ParticipantId> {
         return id.getId();
     }
 
+    public ParticipantId getParticipantId() {
+        return id;
+    }
+
     public BigDecimal getBalance() {
         return balance.getAmount();
     }

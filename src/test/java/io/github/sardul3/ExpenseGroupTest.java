@@ -3,6 +3,7 @@ package io.github.sardul3;
 import io.github.sardul3.account.domain.ExpenseGroup;
 import io.github.sardul3.account.domain.GroupName;
 import io.github.sardul3.account.domain.Participant;
+import io.github.sardul3.account.domain.ParticipantId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +45,8 @@ public class ExpenseGroupTest {
                 .isFalse();
     }
 
+    @Test
+    @DisplayName("Expense Group | should enable adding other participants")
     void expenseGroupShouldAllowAdditionalParticipants() {
         GroupName groupName = GroupName.withName("demo");
         Participant createdBy = Participant.withEmail("creator@example.com");
@@ -53,10 +56,26 @@ public class ExpenseGroupTest {
                 groupName.getName(), createdBy
         );
 
-        UUID participantId = participant.getId();
+        ParticipantId participantId = ParticipantId.from(participant.getId());
         expenseGroup.addParticipant(participantId);
 
-        assertThat(expenseGroup.getParticipants())
-                .hasSize(2);
+        assertThat(expenseGroup.getParticipants().size())
+                .isEqualTo(2);
+    }
+
+    @Test
+    void expenseGroupShouldAddCreatorAsParticipantByDefault() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("user@example.com");
+
+        ExpenseGroup expenseGroup = ExpenseGroup.from(
+                groupName.getName(), createdBy
+        );
+
+        assertThat(expenseGroup.getParticipants().size())
+                .isEqualTo(1);
+
+        assertThat(expenseGroup.getParticipants().get(0).getId())
+                .isEqualTo(createdBy.getParticipantId().getId());
     }
 }
