@@ -82,6 +82,7 @@ public class ExpenseGroupTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should have unique participants per group including creator")
     void expenseGroupShouldNotAddDuplicateParticipants() {
         GroupName groupName = GroupName.withName("demo");
         Participant createdBy = Participant.withEmail("creator@example.com");
@@ -91,7 +92,22 @@ public class ExpenseGroupTest {
                 groupName.getName(), createdBy
         );
 
+        ParticipantId participantId = ParticipantId.from(createdBy.getId());
+        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
+    }
+
+    @Test
+    @DisplayName("Expense Group | should have unique participants per group")
+    void expenseGroupShouldNotAddDuplicateParticipantsMultipleParticipants() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("creator@example.com");
+        Participant participant = Participant.withEmail("user@example.com");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(
+                groupName.getName(), createdBy
+        );
+
         ParticipantId participantId = ParticipantId.from(participant.getId());
+        expenseGroup.addParticipant(participantId);
         assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
     }
 }
