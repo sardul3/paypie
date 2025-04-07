@@ -46,6 +46,8 @@ public class ParticipantTest {
         assertEquals(0, participant.getBalance().compareTo(BigDecimal.ZERO));
     }
 
+    @Test
+    @DisplayName("Participant | participants should have the ability to add credit")
     void participantShouldBeAbleToCreditAccount() {
         final String email = "user@comp.com";
         final int money = 11;
@@ -53,8 +55,8 @@ public class ParticipantTest {
         Money creditMoney = Money.of(new BigDecimal(money));
         participant.credit(creditMoney);
 
-        assertThat(participant.getBalance())
-            .isEqualTo(Money.of(new BigDecimal(money)));
+        assertThat(participant.getBalance()).isEqualByComparingTo("11.00");
+        assertEquals(0, participant.getBalance().compareTo(BigDecimal.valueOf(money)));
     }
 
 

@@ -46,6 +46,9 @@ public class Money {
     }
 
     private void validateAmount(BigDecimal amount) {
+        if(amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
         if(isNegative()) {
             throw new IllegalArgumentException("Amount cannot be negative");
         }

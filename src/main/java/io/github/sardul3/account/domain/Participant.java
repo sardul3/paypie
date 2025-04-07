@@ -7,7 +7,8 @@ import java.util.UUID;
 public class Participant {
     private final UUID id;
     private final ParticipantEmail participantEmail;
-    private final Money balance;
+
+    private  Money balance;
 
     private Participant(UUID id, ParticipantEmail participantEmail, Money balance) {
         this.id = id;
@@ -19,6 +20,10 @@ public class Participant {
         return new Participant(UUID.randomUUID(),
                 ParticipantEmail.of(email),
                 Money.withZeroBalance());
+    }
+
+    public void credit(Money creditMoney) {
+        this.balance = this.balance.add(creditMoney);
     }
 
     public String getEmail() {
