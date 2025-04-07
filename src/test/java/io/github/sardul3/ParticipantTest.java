@@ -1,5 +1,6 @@
 package io.github.sardul3;
 
+import io.github.sardul3.account.domain.Money;
 import io.github.sardul3.account.domain.Participant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,17 @@ public class ParticipantTest {
         final String email = "user@comp.com";
         Participant participant = Participant.withEmail(email);
         assertEquals(0, participant.getBalance().compareTo(BigDecimal.ZERO));
+    }
+
+    void participantShouldBeAbleToCreditAccount() {
+        final String email = "user@comp.com";
+        final int money = 11;
+        Participant participant = Participant.withEmail(email);
+        Money creditMoney = Money.of(new BigDecimal(money));
+        participant.credit(creditMoney);
+
+        assertThat(participant.getBalance())
+            .isEqualTo(Money.of(new BigDecimal(money)));
     }
 
 
