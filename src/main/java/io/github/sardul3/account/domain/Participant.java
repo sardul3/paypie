@@ -9,20 +9,19 @@ import java.util.UUID;
         boundedContext = "expense-management",
         isAggregateRoot = false
 )
-public class Participant {
-    private final UUID id;
+public class Participant extends BaseEntity<ParticipantId> {
     private final ParticipantEmail participantEmail;
 
     private  Money balance;
 
-    private Participant(UUID id, ParticipantEmail participantEmail, Money balance) {
-        this.id = id;
+    private Participant(ParticipantId id, ParticipantEmail participantEmail, Money balance) {
+        super(id);
         this.participantEmail = participantEmail;
         this.balance = balance;
     }
 
     public static Participant withEmail(String email) {
-        return new Participant(UUID.randomUUID(),
+        return new Participant(ParticipantId.generate(),
                 ParticipantEmail.of(email),
                 Money.withZeroBalance());
     }
@@ -49,7 +48,7 @@ public class Participant {
     }
 
     public UUID getId() {
-        return id;
+        return id.getId();
     }
 
     public BigDecimal getBalance() {
