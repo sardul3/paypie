@@ -1,7 +1,8 @@
-package io.github.sardul3.expense.application.port;
+package io.github.sardul3.expense.application.usecase;
 
-import io.github.sardul3.expense.application.port.in.CreateExpenseGroupCommand;
-import io.github.sardul3.expense.application.port.in.CreateExpenseGroupResponse;
+import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
+import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
+import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;

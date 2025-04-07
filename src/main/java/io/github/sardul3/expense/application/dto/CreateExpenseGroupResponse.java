@@ -1,4 +1,4 @@
-package io.github.sardul3.expense.application.port.in;
+package io.github.sardul3.expense.application.dto;
 
 import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
 import io.github.sardul3.expense.domain.valueobject.GroupName;

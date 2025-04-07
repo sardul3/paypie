@@ -1,4 +1,4 @@
-package io.github.sardul3.expense.application.port.in;
+package io.github.sardul3.expense.application.dto;
 
 public class CreateExpenseGroupCommand {
     private final String name;

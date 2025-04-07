@@ -1,10 +1,10 @@
 package io.github.sardul3.expense.expense.service;
 
 import io.github.sardul3.expense.adapter.out.persistence.InMemoryExpenseGroupRepository;
-import io.github.sardul3.expense.application.port.CreateExpenseGroupService;
-import io.github.sardul3.expense.application.port.ExpenseGroupAlreadyExistsException;
-import io.github.sardul3.expense.application.port.in.CreateExpenseGroupCommand;
-import io.github.sardul3.expense.application.port.in.CreateExpenseGroupResponse;
+import io.github.sardul3.expense.application.usecase.CreateExpenseGroupService;
+import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
+import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
+import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
