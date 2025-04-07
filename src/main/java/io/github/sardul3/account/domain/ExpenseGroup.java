@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
+
+    private static final int MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION = 2;
+
     private final GroupName groupName;
     private final Participant groupCreator;
     private boolean isActivated = false;
@@ -44,5 +47,12 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
 
     public List<ParticipantId> getParticipants() {
         return participants;
+    }
+
+    public void activate() {
+        if(this.participants.size() < MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION) {
+            throw new IllegalStateException("Group cannot be activated as it has less than " + MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION + " members");
+        }
+        this.isActivated = true;
     }
 }

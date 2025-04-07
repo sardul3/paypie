@@ -126,7 +126,7 @@ public class ExpenseGroupTest {
 
     @Test
     @DisplayName("Expense Group | can be activated if it has at least 2 members")
-    void expenseGroupCannotBeActivatedBeforeTwoTotalMembers() {
+    void expenseGroupCanBeActivatedAfterTwoTotalMembers() {
         GroupName groupName = GroupName.withName("demo");
         Participant createdBy = Participant.withEmail("user@example.com");
 
