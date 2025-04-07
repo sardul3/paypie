@@ -3,6 +3,10 @@ package io.github.sardul3.account.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+@AggregateRoot(
+        description = "Represents a group of participants collaborating on shared expenses",
+        boundedContext = "expense-management"
+)
 public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
 
     private static final int MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION = 2;
