@@ -1,6 +1,7 @@
 package io.github.sardul3.expense.application.port;
 
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupCommand;
+import io.github.sardul3.expense.application.port.in.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
@@ -16,12 +17,13 @@ public class CreateExpenseGroupService implements CreateExpenseGroupUseCase {
     }
 
     @Override
-    public ExpenseGroup createExpenseGroup(CreateExpenseGroupCommand CreateExpenseGroupCommand) {
+    public CreateExpenseGroupResponse createExpenseGroup(CreateExpenseGroupCommand CreateExpenseGroupCommand) {
         if(expenseGroupRepository.existsByName(CreateExpenseGroupCommand.getName())) {
             throw new ExpenseGroupAlreadyExistsException("Expense group with name " + CreateExpenseGroupCommand.getName() + " already exists");
         }
 
         ExpenseGroup expenseGroup = expenseGroupMapper.toExpenseGroup(CreateExpenseGroupCommand);
-        return expenseGroupRepository.save(expenseGroup);
+        ExpenseGroup savedExpenseGroup = expenseGroupRepository.save(expenseGroup);
+        return expenseGroupMapper.toCreateExpenseGroupResponse(savedExpenseGroup);
     }
 }

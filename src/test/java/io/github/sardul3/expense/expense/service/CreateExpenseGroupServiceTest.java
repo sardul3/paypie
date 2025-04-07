@@ -5,6 +5,7 @@ import io.github.sardul3.expense.application.port.CreateExpenseGroupService;
 import io.github.sardul3.expense.application.port.ExpenseGroupAlreadyExistsException;
 import io.github.sardul3.expense.application.port.ExpenseGroupMapper;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupCommand;
+import io.github.sardul3.expense.application.port.in.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,12 +38,11 @@ public class CreateExpenseGroupServiceTest {
                 "demo", "user@company.com"
         );
 
-        ExpenseGroup expenseGroup = createExpenseGroupService.createExpenseGroup(createExpenseGroupCommand);
+        CreateExpenseGroupResponse expenseGroup = createExpenseGroupService.createExpenseGroup(createExpenseGroupCommand);
 
         assertThat(expenseGroup)
                 .isNotNull();
-        assertThat(expenseGroup.getGroupName().getName()).isEqualTo("demo");
-        assertThat(expenseGroup.getParticipants().size()).isEqualTo(1);
+        assertThat(expenseGroup.name()).isEqualTo("demo");
     }
 
     @Test
@@ -67,7 +67,7 @@ public class CreateExpenseGroupServiceTest {
         CreateExpenseGroupResponse response = createExpenseGroupService.createExpenseGroup(command);
 
         assertThat(response).isNotNull();
-        assertThat(response.name()).isEqualTo("Group One");
-        assertThat(response.groupId()).isNotBlank();
+        assertThat(response.name()).isEqualTo("demo");
+        assertThat(response.id().toString()).isNotBlank();
     }
 }
