@@ -1,13 +1,11 @@
-package io.github.sardul3;
+package io.github.sardul3.expense.expense.model;
 
-import io.github.sardul3.account.domain.ExpenseGroup;
-import io.github.sardul3.account.domain.GroupName;
-import io.github.sardul3.account.domain.Participant;
-import io.github.sardul3.account.domain.ParticipantId;
+import io.github.sardul3.expense.domain.model.ExpenseGroup;
+import io.github.sardul3.expense.domain.model.Participant;
+import io.github.sardul3.expense.domain.valueobject.GroupName;
+import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

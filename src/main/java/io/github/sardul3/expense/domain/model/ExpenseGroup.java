@@ -1,4 +1,10 @@
-package io.github.sardul3.account.domain;
+package io.github.sardul3.expense.domain.model;
+
+import io.github.sardul3.expense.domain.common.annotation.AggregateRoot;
+import io.github.sardul3.expense.domain.common.base.BaseAggregateRoot;
+import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
+import io.github.sardul3.expense.domain.valueobject.GroupName;
+import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.util.ArrayList;
 import java.util.List;

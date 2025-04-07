@@ -1,4 +1,6 @@
-package io.github.sardul3.account.domain;
+package io.github.sardul3.expense.domain.valueobject;
+
+import io.github.sardul3.expense.domain.common.annotation.ValueObject;
 
 import java.util.Objects;
 

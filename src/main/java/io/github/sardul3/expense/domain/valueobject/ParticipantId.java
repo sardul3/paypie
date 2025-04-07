@@ -1,4 +1,6 @@
-package io.github.sardul3.account.domain;
+package io.github.sardul3.expense.domain.valueobject;
+
+import io.github.sardul3.expense.domain.common.base.BaseId;
 
 import java.util.UUID;
 
@@ -6,7 +8,7 @@ import java.util.UUID;
  * Type-safe identifier for Participant entity.
  *
  */
-public class ParticipantId extends BaseId<UUID>{
+public class ParticipantId extends BaseId<UUID> {
     private ParticipantId(UUID id) {
         super(id);
     }

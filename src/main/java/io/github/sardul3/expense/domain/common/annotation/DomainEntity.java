@@ -1,4 +1,4 @@
-package io.github.sardul3.account.domain;
+package io.github.sardul3.expense.domain.common.annotation;
 
 import java.lang.annotation.*;
 

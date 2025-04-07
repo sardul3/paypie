@@ -1,6 +1,6 @@
-package io.github.sardul3;
+package io.github.sardul3.expense.expense.valueobject;
 
-import io.github.sardul3.account.domain.GroupName;
+import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

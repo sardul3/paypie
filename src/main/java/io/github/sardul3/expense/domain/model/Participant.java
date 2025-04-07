@@ -1,4 +1,10 @@
-package io.github.sardul3.account.domain;
+package io.github.sardul3.expense.domain.model;
+
+import io.github.sardul3.expense.domain.common.annotation.DomainEntity;
+import io.github.sardul3.expense.domain.common.base.BaseEntity;
+import io.github.sardul3.expense.domain.valueobject.Money;
+import io.github.sardul3.expense.domain.valueobject.ParticipantEmail;
+import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -12,7 +18,7 @@ import java.util.UUID;
 public class Participant extends BaseEntity<ParticipantId> {
     private final ParticipantEmail participantEmail;
 
-    private  Money balance;
+    private Money balance;
 
     private Participant(ParticipantId id, ParticipantEmail participantEmail, Money balance) {
         super(id);

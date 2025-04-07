@@ -1,8 +1,8 @@
-package io.github.sardul3;
+package io.github.sardul3.expense.expense.valueobject;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.sardul3.account.domain.Money;
+import io.github.sardul3.expense.domain.valueobject.Money;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
