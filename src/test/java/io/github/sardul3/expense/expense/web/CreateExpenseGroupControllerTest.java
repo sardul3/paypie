@@ -1,7 +1,9 @@
 package io.github.sardul3.expense.expense.web;
 
 
-import io.github.sardul3.expense.adapter.in.web.CreateExpenseGroupController;
+import io.github.sardul3.expense.adapter.in.web.controller.CreateExpenseGroupController;
+import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
+import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
@@ -11,10 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -36,15 +35,14 @@ public class CreateExpenseGroupControllerTest {
 
     @Test
     void shouldReturn201CreatedHttpResponseEntityForHappyPath() {
-        ExpenseGroup expenseGroup = ExpenseGroup.from(
-                GroupName.withName("demo"),
-                Participant.withEmail("user@demo.com")
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "demo", "user@demo.com"
         );
 
         when(createExpenseGroupUseCase.createExpenseGroup(any())).thenReturn(
                 new CreateExpenseGroupResponse(UUID.randomUUID(), "demo")
         );
-        ResponseEntity<CreateExpenseGroupResponse> response = createExpenseGroupController.createExpenseGroup(expenseGroup);
+        ResponseEntity<CreateExpenseGroupResponse> response = createExpenseGroupController.createExpenseGroup(request);
 
         assertNotNull(response);
         assertThat(response.getBody().name()).isEqualTo("demo");

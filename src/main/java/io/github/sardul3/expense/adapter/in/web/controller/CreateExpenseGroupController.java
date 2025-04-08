@@ -1,9 +1,9 @@
-package io.github.sardul3.expense.adapter.in.web;
+package io.github.sardul3.expense.adapter.in.web.controller;
 
+import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
-import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/expense")
 public class CreateExpenseGroupController {
 
     private final CreateExpenseGroupUseCase createExpenseGroupUseCase;
@@ -22,11 +22,14 @@ public class CreateExpenseGroupController {
     }
 
 
-    @PostMapping("/expense/group")
-    public ResponseEntity<CreateExpenseGroupResponse> createExpenseGroup(@RequestBody ExpenseGroup expenseGroup) {
+    @PostMapping("/group")
+    public ResponseEntity<CreateExpenseGroupResponse> createExpenseGroup(@RequestBody CreateExpenseGroupRequest request) {
         CreateExpenseGroupResponse response =
                 createExpenseGroupUseCase.createExpenseGroup(
-                        new CreateExpenseGroupCommand(expenseGroup.getGroupName().getName(), expenseGroup.getGroupCreator().getEmail()));
+                        new CreateExpenseGroupCommand(
+                                request.name(), request.createdBy()
+                        )
+                );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
