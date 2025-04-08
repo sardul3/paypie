@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -86,7 +87,10 @@ public class CreateExpenseGroupControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors").isArray())
-                .andExpect(jsonPath("$.errors").isNotEmpty());
+                .andExpect(jsonPath("$.errors").isNotEmpty())
+                .andExpect(jsonPath("$.errors[0].field").value("name"))
+                .andExpect(jsonPath("$.errors[0].message").isNotEmpty())
+                .andExpect(jsonPath("$.errors[0].message").value("cannot be empty"));
 
     }
 
@@ -101,6 +105,27 @@ public class CreateExpenseGroupControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors").isArray())
-                .andExpect(jsonPath("$.errors").isNotEmpty());
+                .andExpect(jsonPath("$.errors").isNotEmpty())
+                .andExpect(jsonPath("$.errors[0].field").value("createdBy"))
+                .andExpect(jsonPath("$.errors[0].message").isNotEmpty())
+                .andExpect(jsonPath("$.errors[0].message").value("needs to be a valid email format"))
+        ;
+    }
+
+    @Test
+    void shouldReturn400BadRequestWithReadableMessageForUserForInvalidPayload() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "", "userdemo.com"
+        );
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors.length()").value(2))
+                .andExpect(jsonPath("$.errors[*].field",
+                        containsInAnyOrder("createdBy", "name")))
+                .andExpect(jsonPath("$.errors[*].message").isNotEmpty());
     }
 }
