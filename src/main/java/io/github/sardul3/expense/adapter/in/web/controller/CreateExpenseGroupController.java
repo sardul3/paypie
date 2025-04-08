@@ -4,6 +4,7 @@ import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class CreateExpenseGroupController {
 
 
     @PostMapping("/groups")
-    public ResponseEntity<CreateExpenseGroupResponse> createExpenseGroup(@RequestBody CreateExpenseGroupRequest request) {
+    public ResponseEntity<CreateExpenseGroupResponse> createExpenseGroup(@Valid @RequestBody CreateExpenseGroupRequest request) {
         CreateExpenseGroupResponse response =
                 createExpenseGroupUseCase.createExpenseGroup(
                         new CreateExpenseGroupCommand(
