@@ -22,7 +22,7 @@ public class CreateExpenseGroupController {
     }
 
 
-    @PostMapping("/group")
+    @PostMapping("/groups")
     public ResponseEntity<CreateExpenseGroupResponse> createExpenseGroup(@RequestBody CreateExpenseGroupRequest request) {
         CreateExpenseGroupResponse response =
                 createExpenseGroupUseCase.createExpenseGroup(
