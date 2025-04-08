@@ -1,5 +1,7 @@
 package io.github.sardul3.expense.expense.persistence;
 
+import io.github.sardul3.expense.adapter.out.persistence.postgres.ExpenseGroupJpaRepository;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.PostgresExpenseGroupRepository;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
@@ -14,7 +16,7 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(PostGresExpenseGroupRepository.class)
+@Import(PostgresExpenseGroupRepository.class)
 @DisplayName("ExpenseGroup | Postgres | Persistence Behavior")
 public class PostGresExpenseGroupRepositoryTest {
 
