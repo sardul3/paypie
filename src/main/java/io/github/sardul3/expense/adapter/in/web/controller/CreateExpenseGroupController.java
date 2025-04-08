@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/api/v1/expense")
 public class CreateExpenseGroupController {
@@ -31,6 +33,6 @@ public class CreateExpenseGroupController {
                                 request.name(), request.createdBy()
                         )
                 );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+        return ResponseEntity.created(URI.create("/api/v1/expense/groups/" + response.id()))
+                .body(response);    }
 }

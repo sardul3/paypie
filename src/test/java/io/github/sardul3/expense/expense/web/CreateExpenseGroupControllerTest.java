@@ -7,6 +7,7 @@ import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CreateExpenseGroupController.class)
+@DisplayName("ExpenseGroup | Web Controller Adapter Behavior")
 public class CreateExpenseGroupControllerTest {
 
     @Autowired
@@ -37,6 +40,7 @@ public class CreateExpenseGroupControllerTest {
     private CreateExpenseGroupUseCase createExpenseGroupUseCase;
 
     @Test
+    @DisplayName("Expense Group | should succeed with no errors")
     void shouldReturn201CreatedHttpResponseEntityForHappyPath() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "demo", "user@demo.com"
@@ -54,6 +58,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 Bad Request for invalid name")
     void shouldReturn400BadRequestForInvalidGroupName() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "", "user@demo.com"
@@ -66,6 +71,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 Bad Request for invalid email")
     void shouldReturn400BadRequestForInvalidEmail() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "demo", "userdemo.com"
@@ -78,6 +84,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 Bad Request for multiple invalid fields")
     void shouldReturn400BadRequestWithReadableMessageForUserForInvalidGroupName() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "", "user@demo.com"
@@ -96,6 +103,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 Bad Request for multiple invalid fields")
     void shouldReturn400BadRequestWithReadableMessageForUserForInvalidEmail() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "demo", "userdemo.com"
@@ -114,6 +122,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 Bad Request for multiple invalid fields")
     void shouldReturn400BadRequestWithReadableMessageForUserForInvalidPayload() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "", "userdemo.com"
@@ -131,6 +140,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 409 for pre-existing expense group")
     void shouldReturn409ConflictWhenGroupAlreadyExists() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "demo", "user@demo.com"
@@ -149,6 +159,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 for error bubbled up from domain layer [IAE]")
     void shouldReturn400BadRequestWhenIllegalArgumentIsThrown() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "demo", "user@demo.com"
@@ -167,6 +178,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
+    @DisplayName("Expense Group | should return 400 for error bubbled up from domain layer [ISE]")
     void shouldReturn409ConflictWhenIllegalStateOccurs() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "demo", "user@demo.com"
@@ -184,5 +196,36 @@ public class CreateExpenseGroupControllerTest {
                 .andExpect(jsonPath("$.error").value("Illegal State"));
     }
 
+    @Test
+    @DisplayName("Expense Group | should return 400 for null fields")
+    void shouldReturn400ForNullFields() throws Exception {
+        String payload = """
+        {
+          "name": null,
+          "createdBy": null
+        }
+        """;
 
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].field", containsInAnyOrder("name", "createdBy")));
+    }
+
+    @Test
+    @DisplayName("Expense Group | should return 400 for missing fields")
+    void shouldReturn400ForMissingFields() throws Exception {
+        String payload = """
+        {
+          "name": "demo"
+        }
+        """;
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[*].field").value("createdBy"));
+    }
 }

@@ -1,0 +1,112 @@
+{
+  "info": {
+    "name": "Expense Group API",
+    "_postman_id": "1718d65d-b4ee-47d0-a88c-13c5deb25487",
+    "description": "Postman collection to test the Create Expense Group API with validations and happy path.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Expense Group - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"team-lunch\", \"createdBy\": \"alice@example.com\"}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/expense/groups",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "expense",
+            "groups"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Response has valid ID and name\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.not.be.undefined;",
+              "    pm.expect(jsonData.name).to.eql(\"team-lunch\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Expense Group - Validation Error",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"\", \"createdBy\": \"bademail\"}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/expense/groups",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "expense",
+            "groups"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Should contain validation errors for name and createdBy\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.errors.length).to.eql(2);",
+              "    const fields = jsonData.errors.map(e => e.field);",
+              "    pm.expect(fields).to.include(\"name\");",
+              "    pm.expect(fields).to.include(\"createdBy\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
