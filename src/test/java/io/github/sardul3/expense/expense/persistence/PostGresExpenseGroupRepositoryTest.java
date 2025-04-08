@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @DataJpaTest
 @Import(PostgresExpenseGroupRepository.class)
@@ -38,4 +39,22 @@ public class PostGresExpenseGroupRepositoryTest {
         assertThat(saved).isNotNull();
         assertThat(repository.existsByName(GroupName.withName("demo"))).isTrue();
     }
+
+    @Test
+    void shouldReturnFalseWhenGroupNameDoesNotExist() {
+        boolean exists = repository.existsByName(GroupName.withName("non-existent"));
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSavingDuplicateGroupName() {
+        ExpenseGroup first = ExpenseGroup.from(GroupName.withName("demo"), Participant.withEmail("a@b.com"));
+        repository.save(first);
+
+        ExpenseGroup duplicate = ExpenseGroup.from(GroupName.withName("demo"), Participant.withEmail("c@d.com"));
+
+        assertThatThrownBy(() -> repository.save(duplicate))
+                .isInstanceOf(Exception.class);
+    }
+
 }
