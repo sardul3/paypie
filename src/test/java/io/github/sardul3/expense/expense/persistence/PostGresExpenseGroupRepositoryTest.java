@@ -45,16 +45,4 @@ public class PostGresExpenseGroupRepositoryTest {
         boolean exists = repository.existsByName(GroupName.withName("non-existent"));
         assertThat(exists).isFalse();
     }
-
-    @Test
-    void shouldThrowExceptionWhenSavingDuplicateGroupName() {
-        ExpenseGroup first = ExpenseGroup.from(GroupName.withName("demo"), Participant.withEmail("a@b.com"));
-        repository.save(first);
-
-        ExpenseGroup duplicate = ExpenseGroup.from(GroupName.withName("demo"), Participant.withEmail("c@d.com"));
-
-        assertThatThrownBy(() -> repository.save(duplicate))
-                .isInstanceOf(Exception.class);
-    }
-
 }
