@@ -50,4 +50,16 @@ public class CreateExpenseGroupControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("demo"));
     }
+
+    @Test
+    void shouldReturn400BadRequestWithReadableMessageForUser() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "", "user@demo.com"
+        );
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
 }
