@@ -11,9 +11,4 @@ public record CreateExpenseGroupRequest(
         @Email(message = "needs to be a valid email format")
         String createdBy
 ) {
-
-    public CreateExpenseGroupRequest(String name, String createdBy) {
-        this.name = name;
-        this.createdBy = createdBy;
-    }
 }

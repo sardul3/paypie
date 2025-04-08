@@ -22,13 +22,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CreateExpenseGroupController.class)
 @DisplayName("ExpenseGroup | Web Controller Adapter Behavior")
-public class CreateExpenseGroupControllerTest {
+class CreateExpenseGroupControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

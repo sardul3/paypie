@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Money | Value Object Behavior")
-public class MoneyTest {
+class MoneyTest {
 
     @Test
     @DisplayName("Money | should be created with valid positive amount and scale to two decimal places")

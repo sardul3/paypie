@@ -6,5 +6,5 @@ import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 
 @InputPort(description = "Handles command to create a new expense group via application layer")
 public interface CreateExpenseGroupUseCase {
-    CreateExpenseGroupResponse createExpenseGroup(CreateExpenseGroupCommand CreateExpenseGroupCommand);
+    CreateExpenseGroupResponse createExpenseGroup(CreateExpenseGroupCommand createExpenseGroupCommand);
 }

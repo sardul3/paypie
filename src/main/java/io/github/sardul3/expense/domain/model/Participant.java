@@ -8,7 +8,6 @@ import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.UUID;
 
 @DomainEntity(
         description = "Represents a participant in an expense group, with balance and email address",

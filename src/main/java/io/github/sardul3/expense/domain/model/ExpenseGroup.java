@@ -8,6 +8,7 @@ import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @AggregateRoot(
         description = "Represents a group of participants collaborating on shared expenses",
@@ -26,7 +27,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         super(expenseGroupId);
         this.groupName = groupName;
         this.groupCreator = groupCreator;
-        this.participants = new ArrayList<ParticipantId>();
+        this.participants = new ArrayList<>();
         this.participants.add(groupCreator.getParticipantId());
     }
 
@@ -48,6 +49,20 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
 
     public Participant getGroupCreator() {
         return groupCreator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ExpenseGroup that = (ExpenseGroup) o;
+        return isActivated == that.isActivated && Objects.equals(groupName, that.groupName) && Objects.equals(groupCreator, that.groupCreator) && Objects.equals(participants, that.participants);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), groupName, groupCreator, isActivated, participants);
     }
 
     public void addParticipant(ParticipantId participantId) {

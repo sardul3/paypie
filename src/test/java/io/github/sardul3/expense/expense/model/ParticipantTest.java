@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("ParticipantEmail | Entity Behavior")
-public class ParticipantTest {
+class ParticipantTest {
 
     @Test
     @DisplayName("Participant | should be created with valid email")

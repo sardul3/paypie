@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("ExpenseGroup | Domain Service Behavior")
-public class CreateExpenseGroupServiceTest {
+class CreateExpenseGroupServiceTest {
 
     private ExpenseGroupRepository expenseGroupRepository;
     private CreateExpenseGroupService createExpenseGroupService;
@@ -30,7 +30,7 @@ public class CreateExpenseGroupServiceTest {
 
     @Test
     @DisplayName("CreateExpenseGroupService | should create a group with all right input")
-    public void testCreateExpenseGroup() {
+    void testCreateExpenseGroup() {
         CreateExpenseGroupCommand createExpenseGroupCommand = new CreateExpenseGroupCommand(
                 "demo", "user@company.com"
         );
@@ -60,7 +60,7 @@ public class CreateExpenseGroupServiceTest {
     class CreateExpenseGroupServiceExceptionPropagationTest {
         @Test
         @DisplayName("CreateExpenseGroupService | should throw custom exception for duplicate groupname")
-        public void testCreateExpenseGroupWithDuplicateName() {
+        void testCreateExpenseGroupWithDuplicateName() {
             CreateExpenseGroupCommand createExpenseGroupCommand = new CreateExpenseGroupCommand(
                     "demo", "user@company.com"
             );

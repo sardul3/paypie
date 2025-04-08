@@ -10,11 +10,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("ParticipantEmail | Value Object Behavior")
-public class ParticipantEmailTest {
+class ParticipantEmailTest {
 
     @Test
     @DisplayName("Participant Email | should be created without errors")
-    public void testParticipantEmailCreation() {
+    void testParticipantEmailCreation() {
         final String emailAddress = "user@test.com";
         ParticipantEmail participantEmail = ParticipantEmail.of(emailAddress);
         assertEquals(emailAddress, participantEmail.getEmail());
@@ -28,7 +28,7 @@ public class ParticipantEmailTest {
             "user@GMAIL.COM"
     })
     @DisplayName("Participant Email | should be normalized to lowercase")
-    public void participantEmailShouldBeNormalizedToLower(String emailAddress) {
+    void participantEmailShouldBeNormalizedToLower(String emailAddress) {
         final String expectedNormalizedEmail = emailAddress.toLowerCase();
 
         ParticipantEmail participantEmail = ParticipantEmail.of(emailAddress);

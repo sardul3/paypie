@@ -6,7 +6,6 @@ import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

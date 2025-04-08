@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
         List<FieldErrorResponse> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(err -> new FieldErrorResponse(err.getField(), err.getDefaultMessage()))
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.badRequest().body(
                 ValidationErrorResponse.of(
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
 
         List<FieldErrorResponse> errors = ex.getFieldErrors().stream()
                 .map(err -> new FieldErrorResponse(err.getField(), err.getDefaultMessage()))
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.badRequest().body(
                 ValidationErrorResponse.of(

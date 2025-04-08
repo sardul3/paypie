@@ -4,7 +4,6 @@ import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 @Component
 public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
@@ -29,7 +28,7 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
                         .name(expenseGroup.getGroupName().getName())
                         .createdBy(expenseGroup.getGroupCreator().getEmail())
                         .build();
-        ExpenseGroupEntity savedExpenseGroup = expenseGroupJpaRepository.save(expenseGroupEntity);
+        expenseGroupJpaRepository.save(expenseGroupEntity);
         return expenseGroup;
     }
 }
