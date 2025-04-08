@@ -1,5 +1,6 @@
 package io.github.sardul3.expense.adapter.in.web.controller;
 
+import io.github.sardul3.expense.adapter.in.web.PrimaryAdapter;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
+@PrimaryAdapter
 @RestController
 @RequestMapping("/api/v1/expense")
 public class CreateExpenseGroupController {

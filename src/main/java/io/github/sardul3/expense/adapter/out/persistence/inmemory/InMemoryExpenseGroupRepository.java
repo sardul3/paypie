@@ -1,4 +1,4 @@
-package io.github.sardul3.expense.adapter.out.persistence;
+package io.github.sardul3.expense.adapter.out.persistence.inmemory;
 
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;

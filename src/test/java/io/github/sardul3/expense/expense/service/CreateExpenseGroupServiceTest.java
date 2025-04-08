@@ -1,6 +1,6 @@
 package io.github.sardul3.expense.expense.service;
 
-import io.github.sardul3.expense.adapter.out.persistence.InMemoryExpenseGroupRepository;
+import io.github.sardul3.expense.adapter.out.persistence.inmemory.InMemoryExpenseGroupRepository;
 import io.github.sardul3.expense.application.usecase.CreateExpenseGroupService;
 import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;

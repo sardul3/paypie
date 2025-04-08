@@ -2,7 +2,6 @@ package io.github.sardul3.expense.expense.web;
 
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.ErrorResponse;
-import io.github.sardul3.expense.adapter.out.persistence.InMemoryExpenseGroupRepository;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
