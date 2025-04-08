@@ -46,6 +46,10 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         return isActivated;
     }
 
+    public Participant getGroupCreator() {
+        return groupCreator;
+    }
+
     public void addParticipant(ParticipantId participantId) {
         if(this.participants.contains(participantId)) {
             throw new IllegalArgumentException("Participant " + participantId + " already exists in the expense group");

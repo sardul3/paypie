@@ -18,11 +18,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateExpenseGroupControllerTest {
@@ -39,9 +40,14 @@ public class CreateExpenseGroupControllerTest {
                 GroupName.withName("demo"),
                 Participant.withEmail("user@demo.com")
         );
+
+        when(createExpenseGroupUseCase.createExpenseGroup(any())).thenReturn(
+                new CreateExpenseGroupResponse(UUID.randomUUID(), "demo")
+        );
         ResponseEntity<CreateExpenseGroupResponse> response = createExpenseGroupController.createExpenseGroup(expenseGroup);
 
         assertNotNull(response);
+        assertThat(response.getBody().name()).isEqualTo("demo");
         assertThat(response.getStatusCodeValue()).isEqualTo(HttpStatus.CREATED.value());
         verify(createExpenseGroupUseCase, times(1)).createExpenseGroup(any());
     }
