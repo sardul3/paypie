@@ -3,9 +3,11 @@ package io.github.sardul3.expense.adapter.in.web;
 import io.github.sardul3.expense.adapter.in.web.dto.ErrorResponse;
 import io.github.sardul3.expense.adapter.in.web.dto.FieldErrorResponse;
 import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
+import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +17,12 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ExpenseGroupAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleExpenseGroupAlreadyExists(
+            ExpenseGroupAlreadyExistsException ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request.getRequestURI());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationErrors(
@@ -32,6 +40,36 @@ public class GlobalExceptionHandler {
                         errors
                 )
         );
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ValidationErrorResponse> handleBindErrors(
+            BindException ex, HttpServletRequest request) {
+
+        List<FieldErrorResponse> errors = ex.getFieldErrors().stream()
+                .map(err -> new FieldErrorResponse(err.getField(), err.getDefaultMessage()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.badRequest().body(
+                ValidationErrorResponse.of(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Binding Error",
+                        request.getRequestURI(),
+                        errors
+                )
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Illegal Argument", ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(
+            IllegalStateException ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.CONFLICT, "Illegal State", ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)

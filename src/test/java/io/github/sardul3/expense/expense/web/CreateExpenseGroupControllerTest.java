@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sardul3.expense.adapter.in.web.controller.CreateExpenseGroupController;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
+import io.github.sardul3.expense.application.exception.ExpenseGroupAlreadyExistsException;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 
 import org.junit.jupiter.api.Test;
@@ -128,4 +129,60 @@ public class CreateExpenseGroupControllerTest {
                         containsInAnyOrder("createdBy", "name")))
                 .andExpect(jsonPath("$.errors[*].message").isNotEmpty());
     }
+
+    @Test
+    void shouldReturn409ConflictWhenGroupAlreadyExists() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "demo", "user@demo.com"
+        );
+
+        when(createExpenseGroupUseCase.createExpenseGroup(any()))
+                .thenThrow(new ExpenseGroupAlreadyExistsException("Group already exists"));
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Group already exists"))
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Conflict"));
+    }
+
+    @Test
+    void shouldReturn400BadRequestWhenIllegalArgumentIsThrown() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "demo", "user@demo.com"
+        );
+
+        when(createExpenseGroupUseCase.createExpenseGroup(any()))
+                .thenThrow(new IllegalArgumentException("Invalid group parameters"));
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid group parameters"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Illegal Argument"));
+    }
+
+    @Test
+    void shouldReturn409ConflictWhenIllegalStateOccurs() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "demo", "user@demo.com"
+        );
+
+        when(createExpenseGroupUseCase.createExpenseGroup(any()))
+                .thenThrow(new IllegalStateException("Group cannot be activated"));
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Group cannot be activated"))
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Illegal State"));
+    }
+
+
 }
