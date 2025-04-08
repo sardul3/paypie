@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: expense-postgres
+    environment:
+      POSTGRES_DB: expense_db
+      POSTGRES_USER: expense_user
+      POSTGRES_PASSWORD: expense_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dbviz:
+    image: dpage/pgadmin4
+    container_name: db-admin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-expense-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/expense_db
+      SPRING_DATASOURCE_USERNAME: expense_user
+      SPRING_DATASOURCE_PASSWORD: expense_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

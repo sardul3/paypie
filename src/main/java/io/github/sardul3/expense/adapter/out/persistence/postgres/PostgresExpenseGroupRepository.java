@@ -3,7 +3,10 @@ package io.github.sardul3.expense.adapter.out.persistence.postgres;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
+@Component
 public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
 
     private final ExpenseGroupJpaRepository expenseGroupJpaRepository;
