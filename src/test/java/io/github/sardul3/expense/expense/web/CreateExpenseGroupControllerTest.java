@@ -52,7 +52,7 @@ public class CreateExpenseGroupControllerTest {
     }
 
     @Test
-    void shouldReturn400BadRequestWithReadableMessageForUser() throws Exception {
+    void shouldReturn400BadRequestForInvalidGroupName() throws Exception {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
                 "", "user@demo.com"
         );
@@ -61,5 +61,46 @@ public class CreateExpenseGroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn400BadRequestForInvalidEmail() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "demo", "userdemo.com"
+        );
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn400BadRequestWithReadableMessageForUserForInvalidGroupName() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "", "user@demo.com"
+        );
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors").isNotEmpty());
+
+    }
+
+    @Test
+    void shouldReturn400BadRequestWithReadableMessageForUserForInvalidEmail() throws Exception {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(
+                "demo", "userdemo.com"
+        );
+
+        mockMvc.perform(post("/api/v1/expense/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors").isNotEmpty());
     }
 }
