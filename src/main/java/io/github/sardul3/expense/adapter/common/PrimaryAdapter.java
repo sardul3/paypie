@@ -1,4 +1,4 @@
-package io.github.sardul3.expense.adapter.in.web;
+package io.github.sardul3.expense.adapter.common;
 
 import java.lang.annotation.*;
 
@@ -42,7 +42,6 @@ import java.lang.annotation.*;
  * }</pre>
  *
  * @see io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase
- * @see io.github.sardul3.expense.domain.common.annotation.SecondaryAdapter
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

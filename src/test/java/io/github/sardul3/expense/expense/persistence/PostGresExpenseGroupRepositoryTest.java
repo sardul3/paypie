@@ -1,7 +1,7 @@
 package io.github.sardul3.expense.expense.persistence;
 
-import io.github.sardul3.expense.adapter.out.persistence.postgres.ExpenseGroupJpaRepository;
-import io.github.sardul3.expense.adapter.out.persistence.postgres.PostgresExpenseGroupRepository;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.ExpenseGroupJpaRepository;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.PostgresExpenseGroupRepository;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;

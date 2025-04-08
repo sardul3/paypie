@@ -1,10 +1,13 @@
-package io.github.sardul3.expense.adapter.out.persistence.postgres;
+package io.github.sardul3.expense.adapter.out.persistence.postgres.repository;
 
+import io.github.sardul3.expense.adapter.common.SecondaryAdapter;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.ExpenseGroupEntity;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.springframework.stereotype.Component;
 
+@SecondaryAdapter
 @Component
 public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
 

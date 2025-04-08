@@ -1,4 +1,4 @@
-package io.github.sardul3.expense.adapter.out.persistence.postgres;
+package io.github.sardul3.expense.adapter.out.persistence.postgres.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

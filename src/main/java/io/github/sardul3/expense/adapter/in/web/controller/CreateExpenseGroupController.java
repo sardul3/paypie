@@ -1,6 +1,6 @@
 package io.github.sardul3.expense.adapter.in.web.controller;
 
-import io.github.sardul3.expense.adapter.in.web.PrimaryAdapter;
+import io.github.sardul3.expense.adapter.common.PrimaryAdapter;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;

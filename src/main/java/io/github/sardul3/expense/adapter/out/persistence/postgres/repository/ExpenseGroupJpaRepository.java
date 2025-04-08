@@ -1,6 +1,6 @@
-package io.github.sardul3.expense.adapter.out.persistence.postgres;
+package io.github.sardul3.expense.adapter.out.persistence.postgres.repository;
 
-import io.github.sardul3.expense.domain.model.ExpenseGroup;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.ExpenseGroupEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
