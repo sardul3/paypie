@@ -7,8 +7,13 @@ import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -18,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 public class CreateExpenseGroupControllerTest {
 
     @Mock
@@ -28,16 +34,14 @@ public class CreateExpenseGroupControllerTest {
 
     @Test
     void shouldReturn201CreatedHttpResponseEntityForHappyPath() {
-        CreateExpenseGroupController controller = new CreateExpenseGroupController();
-
         ExpenseGroup expenseGroup = ExpenseGroup.from(
                 GroupName.withName("demo"),
                 Participant.withEmail("user@demo.com")
         );
-        ResponseEntity<String> response = controller.createExpenseGroup(expenseGroup);
+        ResponseEntity<String> response = createExpenseGroupController.createExpenseGroup(expenseGroup);
 
         assertNotNull(response);
         assertThat(response.getStatusCodeValue()).isEqualTo(HttpStatus.CREATED.value());
-        verify(createExpenseGroupUseCase.createExpenseGroup(any()), times(1));
+        verify(createExpenseGroupUseCase, times(1)).createExpenseGroup(any());
     }
 }
