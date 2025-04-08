@@ -2,6 +2,7 @@ package io.github.sardul3.expense.expense.web;
 
 
 import io.github.sardul3.expense.adapter.in.web.CreateExpenseGroupController;
+import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
@@ -38,7 +39,7 @@ public class CreateExpenseGroupControllerTest {
                 GroupName.withName("demo"),
                 Participant.withEmail("user@demo.com")
         );
-        ResponseEntity<String> response = createExpenseGroupController.createExpenseGroup(expenseGroup);
+        ResponseEntity<CreateExpenseGroupResponse> response = createExpenseGroupController.createExpenseGroup(expenseGroup);
 
         assertNotNull(response);
         assertThat(response.getStatusCodeValue()).isEqualTo(HttpStatus.CREATED.value());
