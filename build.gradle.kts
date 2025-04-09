@@ -26,6 +26,7 @@ dependencies {
 //    testImplementation("org.testcontainers:junit-jupiter:1.20.6")
 //    testImplementation("org.testcontainers:postgresql:1.20.6")
     testImplementation("com.h2database:h2")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
 }
 
 tasks.test {
