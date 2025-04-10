@@ -22,9 +22,8 @@ public class GroupName {
             throw new IllegalArgumentException("Name cannot be empty");
         }
         if(trimmedName.length() > 50) {
-            throw new IllegalArgumentException(
-                    String.format("Name cannot be longer than {} characters",
-                            MAX_GROUP_NAME_LENGTH_LIMIT));
+            throw new IllegalArgumentException("Name cannot be longer than {} characters" +
+                            MAX_GROUP_NAME_LENGTH_LIMIT);
         }
         this.name = trimmedName;
     }

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,6 +59,16 @@ public class GlobalExceptionHandler {
                         errors
                 )
         );
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedMediaType(
+            HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Unsupported Media Type",
+                ex.getLocalizedMessage(),
+                request.getRequestURI()
+                );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

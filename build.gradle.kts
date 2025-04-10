@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    jacoco
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
 }
@@ -23,12 +24,26 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-//    testImplementation("org.testcontainers:junit-jupiter:1.20.6")
-//    testImplementation("org.testcontainers:postgresql:1.20.6")
-    testImplementation("com.h2database:h2")
+
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.6")
+    testImplementation("org.testcontainers:postgresql:1.20.6")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+    }
 }
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }

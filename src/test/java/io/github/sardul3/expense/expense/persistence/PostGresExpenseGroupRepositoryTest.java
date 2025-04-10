@@ -6,22 +6,18 @@ import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
+import io.github.sardul3.integration.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-@DataJpaTest
 @Import(PostgresExpenseGroupRepository.class)
 @DisplayName("ExpenseGroup | Postgres | Persistence Behavior")
-@ActiveProfiles("test")
-public class PostGresExpenseGroupRepositoryTest {
+public class PostGresExpenseGroupRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private ExpenseGroupJpaRepository jpaRepository;
