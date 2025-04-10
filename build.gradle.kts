@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     id("java")
     jacoco
@@ -46,4 +48,19 @@ tasks.jacocoTestReport {
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
+tasks.named<BootBuildImage>("bootBuildImage") {
+    imageName.set("sagarpoudel14/paypie-app")
+    environment.set(
+        mapOf(
+            "BP_JVM_VERSION" to "17",
+            "BP_NATIVE_IMAGE" to "false"
+        )
+    )
+    builder.set("paketobuildpacks/builder:tiny") // or "tiny", "base"
+}
+
+repositories {
+    mavenCentral()
 }
