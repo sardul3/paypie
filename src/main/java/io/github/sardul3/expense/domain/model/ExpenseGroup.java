@@ -51,20 +51,6 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         return groupCreator;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ExpenseGroup that = (ExpenseGroup) o;
-        return isActivated == that.isActivated && Objects.equals(groupName, that.groupName) && Objects.equals(groupCreator, that.groupCreator) && Objects.equals(participants, that.participants);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), groupName, groupCreator, isActivated, participants);
-    }
-
     public void addParticipant(ParticipantId participantId) {
         if(this.participants.contains(participantId)) {
             throw new IllegalArgumentException("Participant " + participantId + " already exists in the expense group");

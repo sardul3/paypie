@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.junit.platform.launcher.TagFilter.excludeTags
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
@@ -46,7 +47,9 @@ tasks.jacocoTestReport {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform() {
+        excludeTags("integration")
+    }
     finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 

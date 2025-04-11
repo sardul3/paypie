@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("ExpenseGroup | Aggregate Root Behavior")
@@ -142,5 +143,26 @@ public class ExpenseGroupTest {
 
         assertThat(expenseGroup.isActivated())
                 .isTrue();
+    }
+
+    @Test
+    void expenseGroupAreComparedById() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("user@example.com");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, createdBy);
+
+        ExpenseGroup expenseGroup2 = ExpenseGroup.from(groupName, createdBy);
+
+        assertNotEquals(expenseGroup, expenseGroup2);
+    }
+
+    @Test
+    void expenseGroupShouldHaveGroupCreatorAvailable() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("user@example.com");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, createdBy);
+
+        assertThat(expenseGroup.getGroupCreator()).isNotNull();
+        assertThat(expenseGroup.getGroupCreator().getEmail()).isEqualTo("user@example.com");
     }
 }

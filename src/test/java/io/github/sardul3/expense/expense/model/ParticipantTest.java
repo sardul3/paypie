@@ -116,4 +116,13 @@ class ParticipantTest {
         Money creditMoney = Money.of(new BigDecimal(money));
         assertThrows(IllegalArgumentException.class, () -> participant.debit(creditMoney));
     }
+
+    @Test
+    void participantShouldBeRepresentedWellWithToString() {
+        final String email = "user@comp.com";
+        Participant participant = Participant.withEmail(email);
+        assertThat(participant.toString())
+                .contains("user@comp.com")
+                .contains("0.00");
+    }
 }

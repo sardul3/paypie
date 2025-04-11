@@ -13,21 +13,8 @@ public abstract class BaseEntity<ID extends BaseId<?>> {
         this.id = Objects.requireNonNull(id, "Entity ID cannot be null");
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseEntity<?> that = (BaseEntity<?>) o;
-        return Objects.equals(id, that.id);
-    }
-
     public ID getId() {
         return id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 
     @Override
