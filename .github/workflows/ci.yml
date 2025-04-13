@@ -135,26 +135,57 @@ jobs:
       - name: 🧬 Run PIT
         run: ./gradlew pitest
 
-      - name: 📛 Mutation Badge
+      - name: 📄 Parse mutation-report.xml and generate summary + badge
         run: |
-          mkdir -p .github/badges
-          if [[ -f build/reports/pitest/mutation-report.json ]]; then
-            RATE=$(grep -oP 'mutationCoverage\s*=\s*\K[0-9\.]+' build/reports/pitest/mutation-report.json || echo "0")
-            echo "Mutation coverage: $RATE%"
-            echo "![mutation](https://img.shields.io/badge/Mutation-${RATE}%25-brightgreen)" > .github/badges/mutation-badge.md
+          FILE="build/reports/pitest/mutations.xml"
+          SUMMARY_DIR="mutation-summary"
+          BADGE_DIR=".github/badges"
+          mkdir -p "$SUMMARY_DIR" "$BADGE_DIR"
+
+          if [[ -f "$FILE" ]]; then
+            TOTAL=$(grep -c "<mutation " "$FILE")
+            KILLED=$(grep "status='KILLED'" "$FILE" | wc -l)
+            SURVIVED=$(grep "status='SURVIVED'" "$FILE" | wc -l)
+
+            if [ "$TOTAL" -gt 0 ]; then
+              RATE=$(echo "scale=2; ($KILLED / $TOTAL) * 100" | bc)
+            else
+              RATE="0.00"
+            fi
+
+            # Markdown summary
+            {
+              echo "### PIT Mutation Summary"
+              echo ""
+              echo "- ✅ Total Mutants: **$TOTAL**"
+              echo "- 🧪 Killed: **$KILLED**"
+              echo "- ⚠️ Survived: **$SURVIVED**"
+              echo "- 🎯 Mutation Score: **$RATE%**"
+            } > "$SUMMARY_DIR/summary.md"
+
+            # Badge
+            echo "![mutation](https://img.shields.io/badge/Mutation-${RATE}%25-brightgreen)" > "$BADGE_DIR/mutation-badge.md"
+
+            echo "✅ Generated mutation summary and badge at: $SUMMARY_DIR + $BADGE_DIR"
           else
-            echo "![mutation](https://img.shields.io/badge/Mutation-unknown-lightgrey)" > .github/badges/mutation-badge.md
+            echo "⚠️ No mutation-report.xml found"
+            echo "No mutation-report.xml found" > "$SUMMARY_DIR/summary.md"
+            echo "![mutation](https://img.shields.io/badge/Mutation-unknown-lightgrey)" > "$BADGE_DIR/mutation-badge.md"
           fi
 
-      - uses: actions/upload-artifact@v4
+      - name: 📂 Upload mutation HTML report
+        uses: actions/upload-artifact@v4
         with:
-          name: mutation-badges
-          path: .github/badges
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mutation-test-report
+          name: mutation-html-report
           path: build/reports/pitest/
+
+      - name: 🗃️ Upload summary + badge
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-summary-badges
+          path: |
+            mutation-summary/summary.md
+            .github/badges/mutation-badge.md
 
   store-badges:
     needs: [unit-tests, mutation-tests]
