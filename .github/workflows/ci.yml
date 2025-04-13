@@ -97,14 +97,16 @@ jobs:
           name: mutation-badge
           path: .github/badges
 
-      - name: Download mutation summary
+      - name: Download mutation badge
         uses: actions/download-artifact@v4
         with:
-          name: mutation-summary
-          path: mutation-summary
+          name: mutation-badge
+          path: mutation-badge-temp
 
-      - name: Set permissions for badges
-        run: chmod -R u+w .github/badges
+      - name: Copy badge to .github/badges
+        run: |
+          mkdir -p .github/badges
+          cp mutation-badge-temp/mutation-badge.md .github/badges/
 
       - name: Archive all badges
         uses: actions/upload-artifact@v4
