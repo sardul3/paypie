@@ -1,5 +1,4 @@
-name: 🧪 CI: Test + Coverage + Mutation
-
+name: CI Test [Mutation, coverage, integration and more]
 on:
   push:
     branches: [main]
