@@ -2,6 +2,10 @@
 
 PayPie is a robust expense management system built using Domain-Driven Design (DDD) and Hexagonal Architecture principles. It provides a clean, maintainable, and scalable solution for managing shared expenses among groups of participants.
 
+
+[![coverage](https://raw.githubusercontent.com/sardul3/paypie/main/.github/badges/jacoco.svg)]()
+[![mutation](https://github.com/sardul3/paypie/blob/main/.github/badges/mutation.svg)]()
+
 ## 🏗️ Architecture
 
 PayPie follows a clean architecture approach with clear separation of concerns:
