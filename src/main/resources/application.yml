@@ -7,3 +7,6 @@ spring:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     show-sql: true
+  threads:
+    virtual:
+      enabled: true
