@@ -161,17 +161,16 @@ jobs:
             </g>
             </svg>
             EOF
-  
-          else
+            else
             echo "No mutation-report.xml found" > "$SUMMARY_DIR/summary.md"
-  
-          cat <<EOF > "$BADGE_DIR/mutation.svg"
-          <?xml version="1.0" encoding="UTF-8"?>
-        <svg xmlns="http://www.w3.org/2000/svg" width="140" height="20" role="img" aria-label="mutation: unknown">
-          <rect width="140" height="20" fill="#9f9f9f"/>
-          <text x="70" y="14" fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11" dominant-baseline="middle">Mutation Unknown</text>
-          </svg>
-          EOF
+            
+            cat <<EOF > "$BADGE_DIR/mutation.svg"
+            <?xml version="1.0" encoding="UTF-8"?>
+          <svg xmlns="http://www.w3.org/2000/svg" width="140" height="20" role="img" aria-label="mutation: unknown">
+            <rect width="140" height="20" fill="#9f9f9f"/>
+            <text x="70" y="14" fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11" dominant-baseline="middle">Mutation Unknown</text>
+            </svg>
+            EOF
           fi
 
       - uses: actions/upload-artifact@v4
