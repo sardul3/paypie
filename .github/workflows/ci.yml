@@ -1,0 +1,106 @@
+name: 🧪 CI: Test + Coverage + Mutation
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+  unit-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    name: 🧪 Unit Tests
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gradlew test -Djunit.jupiter.tags.exclude=integration
+      - run: ./gradlew jacocoTestReport
+      - name: ☂️ Generate Layered Coverage Badges
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+          classes-to-analyze: |
+            io.github.sardul3.domain.*
+            io.github.sardul3.application.*
+            io.github.sardul3.adapter.*
+          badge-directory: .github/badges
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: build/reports/tests/test/
+
+  integration-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    name: 🔌 Integration Tests (Testcontainers)
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+      SPRING_DATASOURCE_USERNAME: test
+      SPRING_DATASOURCE_PASSWORD: test
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gradlew test -Djunit.jupiter.tags.include=integration
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-report
+          path: build/reports/tests/test/
+
+  mutation-tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    name: 🔬 PIT Mutation Tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🧬 Run PIT
+        run: ./gradlew pitest
+      - name: 📛 Mutation Badge
+        run: |
+          MUTATION_RATE=$(grep -oP 'mutationCoverage = \K[0-9\.]+' build/reports/pitest/mutation-report.json)
+          echo "Mutation coverage: $MUTATION_RATE%"
+          mkdir -p .github/badges
+          echo "![mutation](https://img.shields.io/badge/Mutation-${MUTATION_RATE}%25-brightgreen)" > .github/badges/mutation-badge.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutation-test-report
+          path: build/reports/pitest/
+
+  publish-badges:
+    needs: [unit-tests, mutation-tests]
+    runs-on: ubuntu-latest
+    name: 🏁 Publish Badges to GitHub Pages
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy badge files
+        run: |
+          mkdir -p badges
+          cp -r .github/badges/* badges/
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: badges

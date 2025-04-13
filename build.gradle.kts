@@ -81,6 +81,15 @@ pitest {
     timestampedReports.set(false)
 }
 
+tasks.register<Test>("integrationTest") {
+    useJUnitPlatform {
+        includeTags("integration")
+    }
+    shouldRunAfter(tasks.test)
+    description = "Runs only integration tests marked with @Tag(\"integration\")"
+    group = "verification"
+}
+
 repositories {
     mavenCentral()
 }
