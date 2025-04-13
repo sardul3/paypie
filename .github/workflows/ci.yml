@@ -106,7 +106,7 @@ jobs:
       - name: 🧬 Run PIT
         run: ./gradlew pitest
 
-      - name: 📄 Generate mutation summary and SVG badge
+      - name: 📄 Generate mutation summary and badge
         run: |
           FILE="build/reports/pitest/mutations.xml"
           SUMMARY_DIR="mutation-summary"
@@ -124,12 +124,13 @@ jobs:
               RATE="0.00"
             fi
           
-            COLOR="#4c1"
-            TEXT="#ffffff"
-            if (( $(echo "$RATE < 90" | bc -l) )); then COLOR="#dfb317"; TEXT="#000000"; fi
-            if (( $(echo "$RATE < 75" | bc -l) )); then COLOR="#fe7d37"; TEXT="#000000"; fi
-            if (( $(echo "$RATE < 50" | bc -l) )); then COLOR="#e05d44"; TEXT="#ffffff"; fi
+            # Generate color based on coverage rate
+            COLOR="red"
+            if (( $(echo "$RATE >= 90" | bc -l) )); then COLOR="brightgreen"; fi
+            if (( $(echo "$RATE >= 75 && $RATE < 90" | bc -l) )); then COLOR="yellow"; fi
+            if (( $(echo "$RATE >= 50 && $RATE < 75" | bc -l) )); then COLOR="orange"; fi
           
+            # Create summary markdown
             {
               echo "### PIT Mutation Summary"
               echo ""
@@ -139,38 +140,11 @@ jobs:
               echo "- 🎯 Mutation Score: **$RATE%**"
             } > "$SUMMARY_DIR/summary.md"
           
-            # Safe way to echo multi-line XML
-            cat <<EOF > "$BADGE_DIR/mutation.svg"
-            <?xml version="1.0" encoding="UTF-8"?>
-          <svg xmlns="http://www.w3.org/2000/svg" width="140" height="20" role="img" aria-label="mutation: ${RATE}%">
-            <linearGradient id="b" x2="0" y2="100%">
-            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
-            <stop offset="1" stop-opacity=".1"/>
-            </linearGradient>
-            <mask id="a">
-            <rect width="140" height="20" rx="3" fill="#fff"/>
-            </mask>
-            <g mask="url(#a)">
-            <rect width="75" height="20" fill="#555"/>
-            <rect x="75" width="65" height="20" fill="${COLOR}"/>
-            <rect width="140" height="20" fill="url(#b)"/>
-            </g>
-            <g fill="${TEXT}" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
-            <text x="38" y="14" dominant-baseline="middle">mutation</text>
-            <text x="105" y="14" dominant-baseline="middle">${RATE}%</text>
-            </g>
-            </svg>
-            EOF
-            else
+            # Download the badge from shields.io
+            curl -s "https://img.shields.io/badge/mutation-${RATE}%25-${COLOR}" > "$BADGE_DIR/mutation.svg"
+          else
             echo "No mutation-report.xml found" > "$SUMMARY_DIR/summary.md"
-            
-            cat <<EOF > "$BADGE_DIR/mutation.svg"
-            <?xml version="1.0" encoding="UTF-8"?>
-          <svg xmlns="http://www.w3.org/2000/svg" width="140" height="20" role="img" aria-label="mutation: unknown">
-            <rect width="140" height="20" fill="#9f9f9f"/>
-            <text x="70" y="14" fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11" dominant-baseline="middle">Mutation Unknown</text>
-            </svg>
-            EOF
+            curl -s "https://img.shields.io/badge/mutation-unknown-lightgrey" > "$BADGE_DIR/mutation.svg"
           fi
 
       - uses: actions/upload-artifact@v4
