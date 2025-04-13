@@ -69,6 +69,11 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: coverage-badges
+          path: .github/badges
+
+      - uses: actions/upload-artifact@v4
+        with:
           name: unit-test-report
           path: build/reports/tests/test/
 
@@ -96,14 +101,18 @@ jobs:
       SPRING_DATASOURCE_PASSWORD: test
     steps:
       - uses: actions/checkout@v4
-      - run: chmod +x gradlew
       - uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Run Integration Tests
         run: ./gradlew integrationTest
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -139,19 +148,35 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: mutation-badges
+          path: .github/badges
+
+      - uses: actions/upload-artifact@v4
+        with:
           name: mutation-test-report
           path: build/reports/pitest/
 
-  publish-badges:
+  store-badges:
     needs: [unit-tests, mutation-tests]
     runs-on: ubuntu-latest
-    name: 🏁 Publish Badges to GitHub Pages
+    name: 🗃️ Store Combined Badges
     steps:
       - uses: actions/checkout@v4
 
-      - name: Copy badge files
+      - name: Download coverage badges
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-badges
+          path: .github/badges
+
+      - name: Download mutation badges
+        uses: actions/download-artifact@v4
+        with:
+          name: mutation-badges
+          path: .github/badges
+
+      - name: Copy badge files to archive directory
         run: |
-          mkdir -p .github/badges
           mkdir -p badges
           if compgen -G ".github/badges/*" > /dev/null; then
             cp .github/badges/* badges/
@@ -159,7 +184,8 @@ jobs:
             echo "No badge files found to copy."
           fi
 
-      - uses: peaceiris/actions-gh-pages@v3
+      - name: 📦 Archive all badges
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: badges
+          name: combined-badges
+          path: badges
