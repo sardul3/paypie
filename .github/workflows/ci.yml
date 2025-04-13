@@ -63,7 +63,7 @@ jobs:
       SPRING_DATASOURCE_PASSWORD: test
     steps:
       - uses: actions/checkout@v4
-      - run: ./gradlew test -Djunit.jupiter.tags.include=integration
+      - run: ./gradlew integrationTest
       - uses: actions/upload-artifact@v4
         with:
           name: integration-test-report
