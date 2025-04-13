@@ -1,26 +1,26 @@
-import org.gradle.internal.impldep.org.junit.platform.launcher.TagFilter.excludeTags
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    id("java")
+    java
     jacoco
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
-
     id("info.solidsoft.pitest") version "1.15.0"
-
 }
 
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
 }
 
 group = "io.github.sardul3"
 version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -39,8 +39,6 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.20.6")
     testImplementation("org.testcontainers:postgresql:1.20.6")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
-
-
 }
 
 jacoco {
@@ -48,18 +46,25 @@ jacoco {
 }
 
 tasks.jacocoTestReport {
+    dependsOn(tasks.test) // Ensures test runs before report
     reports {
-        xml.required = false
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+        xml.required.set(true)
+        csv.required.set(true)
     }
 }
 
-tasks.test {
-    useJUnitPlatform() {
+tasks.named<Test>("test") {
+    useJUnitPlatform {
         excludeTags("integration")
     }
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+
+    maxHeapSize = "1G"
+
+    testLogging {
+        events = setOf(TestLogEvent.PASSED)
+    }
+
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.named<BootBuildImage>("bootBuildImage") {
@@ -70,18 +75,18 @@ tasks.named<BootBuildImage>("bootBuildImage") {
             "BP_NATIVE_IMAGE" to "false"
         )
     )
-    builder.set("paketobuildpacks/builder:tiny") // or "tiny", "base"
+    builder.set("paketobuildpacks/builder:tiny")
 }
 
 pitest {
-    junit5PluginVersion.set("1.2.1") // required for JUnit 5
-    testPlugin.set("junit5") // if you're using JUnit 5
-    targetClasses.set(listOf("io.github.sardul3.expense.domain.*")) // your main classes
-    targetTests.set(listOf("io.github.sardul3.expense.expense.*")) // your test classes
+    junit5PluginVersion.set("1.2.1")
+    testPlugin.set("junit5")
+    targetClasses.set(listOf("io.github.sardul3.expense.domain.*"))
+    targetTests.set(listOf("io.github.sardul3.expense.expense.*"))
     threads.set(Runtime.getRuntime().availableProcessors())
     outputFormats.set(listOf("HTML", "XML"))
-    mutationThreshold.set(80) // set threshold for failing builds
-    coverageThreshold.set(80) // optional line coverage requirement
+    mutationThreshold.set(80)
+    coverageThreshold.set(80)
     timestampedReports.set(false)
 }
 
@@ -89,11 +94,13 @@ tasks.register<Test>("integrationTest") {
     useJUnitPlatform {
         includeTags("integration")
     }
+
     shouldRunAfter(tasks.test)
+
+    testLogging {
+        events = setOf(TestLogEvent.PASSED)
+    }
+
     description = "Runs only integration tests marked with @Tag(\"integration\")"
     group = "verification"
-}
-
-repositories {
-    mavenCentral()
 }
