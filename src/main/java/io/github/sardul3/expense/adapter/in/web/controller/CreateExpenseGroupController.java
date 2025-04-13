@@ -6,6 +6,8 @@ import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,8 @@ import java.net.URI;
 @RequestMapping("/api/v1/expense")
 public class CreateExpenseGroupController {
 
+    private final static Logger log = LoggerFactory.getLogger(CreateExpenseGroupController.class);
+
     private final CreateExpenseGroupUseCase createExpenseGroupUseCase;
 
     public CreateExpenseGroupController(CreateExpenseGroupUseCase createExpenseGroupUseCase) {
@@ -29,6 +33,7 @@ public class CreateExpenseGroupController {
 
     @PostMapping(value ="/groups", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreateExpenseGroupResponse> createExpenseGroup(@Valid @RequestBody CreateExpenseGroupRequest request) {
+        log.info("Create expense group request: {}", request);
         CreateExpenseGroupResponse response =
                 createExpenseGroupUseCase.createExpenseGroup(
                         new CreateExpenseGroupCommand(
