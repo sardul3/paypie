@@ -80,14 +80,19 @@ tasks.named<BootBuildImage>("bootBuildImage") {
 
 pitest {
     junit5PluginVersion.set("1.2.1")
-    testPlugin.set("junit5")
-    targetClasses.set(listOf("io.github.sardul3.expense.domain.*"))
-    targetTests.set(listOf("io.github.sardul3.expense.expense.*"))
+    targetClasses.set(listOf("io.github.sardul3.expense.domain.model.*"))
+    targetTests.set(listOf("io.github.sardul3.expense.expense.model.*"))
     threads.set(Runtime.getRuntime().availableProcessors())
     outputFormats.set(listOf("HTML", "XML"))
     mutationThreshold.set(80)
     coverageThreshold.set(80)
     timestampedReports.set(false)
+//    jvmArgs.set(
+//        listOf(
+//            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+//            "--add-opens=java.base/java.util=ALL-UNNAMED"
+//        )
+//    )
 }
 
 tasks.register<Test>("integrationTest") {
