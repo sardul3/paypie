@@ -94,6 +94,33 @@ class MoneyTest {
     }
 
     @Test
+    @DisplayName("Money | should be same when compared with same object")
+    void moneyEqualityShouldBeTrueWhenComparedWithSameObject() {
+        Money m1 = Money.of(new BigDecimal("10.00"));
+
+        assertEquals(m1, m1);
+        assertEquals(m1.hashCode(), m1.hashCode());
+    }
+
+    @Test
+    @DisplayName("Money | should be different when compared with null")
+    void moneyEqualityShouldBeTrueWhenComparedWithNullObject() {
+        Money m1 = Money.of(new BigDecimal("10.00"));
+        Money m2 = null;
+
+        assertThat(m1).isNotEqualTo(m2);
+    }
+
+    @Test
+    @DisplayName("Money | should be different when compared with a different type")
+    void moneyEqualityShouldBeTrueWhenComparedWithDifferentType() {
+        Money m1 = Money.of(new BigDecimal("10.00"));
+        BigDecimal m2 = BigDecimal.valueOf(10L, 2);
+
+        assertThat(m1).isNotEqualTo(m2);
+    }
+
+    @Test
     @DisplayName("Money | equals should not match for different amounts")
     void moneyWithDifferentAmountsShouldNotBeEqual() {
         Money m1 = Money.of(new BigDecimal("10.00"));

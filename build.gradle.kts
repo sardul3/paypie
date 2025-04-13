@@ -6,6 +6,9 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
+
+    id("info.solidsoft.pitest") version "1.15.0"
+
 }
 
 group = "io.github.sardul3"
@@ -62,6 +65,18 @@ tasks.named<BootBuildImage>("bootBuildImage") {
         )
     )
     builder.set("paketobuildpacks/builder:tiny") // or "tiny", "base"
+}
+
+pitest {
+    junit5PluginVersion.set("1.2.1") // required for JUnit 5
+    testPlugin.set("junit5") // if you're using JUnit 5
+    targetClasses.set(listOf("io.github.sardul3.expense.domain.*")) // your main classes
+    targetTests.set(listOf("io.github.sardul3.expense.expense.*")) // your test classes
+    threads.set(Runtime.getRuntime().availableProcessors())
+    outputFormats.set(listOf("HTML", "XML"))
+    mutationThreshold.set(80) // set threshold for failing builds
+    coverageThreshold.set(80) // optional line coverage requirement
+    timestampedReports.set(false)
 }
 
 repositories {

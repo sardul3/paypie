@@ -65,6 +65,15 @@ class ParticipantEmailTest {
     }
 
     @Test
+    @DisplayName("Participant Email | should be considered same when compared to itself")
+    void participantEmailShouldBeEqualIfComparedAgainstItself() {
+        final String emailAddress = "user@test.com";
+        ParticipantEmail participantEmail = ParticipantEmail.of(emailAddress);
+
+        assertEquals(participantEmail, participantEmail);
+    }
+
+    @Test
     @DisplayName("Participant Email | different emails should not be equal")
     void participantEmailsShouldNotBeEqualIfDifferent() {
         ParticipantEmail email1 = ParticipantEmail.of("a@x.com");
@@ -72,6 +81,24 @@ class ParticipantEmailTest {
 
         assertNotEquals(email1, email2);
         assertNotEquals(email1.hashCode(), email2.hashCode());
+    }
+
+    @Test
+    @DisplayName("Participant Email | different type should not be equal")
+    void participantEmailsShouldNotBeEqualIfDifferentType() {
+        ParticipantEmail email1 = ParticipantEmail.of("a@x.com");
+        String email2 = "a@x.com";
+
+        assertThat(email1).isNotEqualTo(email2);
+    }
+
+    @Test
+    @DisplayName("Participant Email | different type should not be null")
+    void participantEmailsShouldNotBeEqualWhenComparedToNull() {
+        ParticipantEmail email1 = ParticipantEmail.of("a@x.com");
+        String email2 = null;
+
+        assertThat(email1).isNotEqualTo(email2);
     }
 
     @Test

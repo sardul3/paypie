@@ -17,10 +17,4 @@ public abstract class BaseEntity<ID extends BaseId<?>> {
         return id;
     }
 
-    @Override
-    public String toString() {
-        return "BaseEntity{" +
-                "id=" + id +
-                '}';
-    }
 }

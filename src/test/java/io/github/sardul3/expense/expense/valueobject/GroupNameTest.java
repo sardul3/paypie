@@ -109,6 +109,29 @@ class GroupNameTest {
     }
 
     @Test
+    @DisplayName("Expense Group | equality should be invalid if different types")
+    void expenseGroupNameCheckEqualityTestWithDifferentTypes() {
+        String groupName = " test-expense-group";
+        String anotherGroupName = "test-expense-group  ";
+
+        GroupName expenseGroupName = GroupName.withName(groupName);
+
+        assertThat(expenseGroupName).isNotEqualTo(groupName);
+    }
+
+    @Test
+    @DisplayName("Expense Group | equality should be invalid if compared with null")
+    void expenseGroupNameCheckEqualityTestWithNullValue() {
+        String groupName = " test-expense-group";
+        String anotherGroupName = null;
+
+        GroupName expenseGroupName = GroupName.withName(groupName);
+
+        assertThat(expenseGroupName).isNotEqualTo(anotherGroupName);
+    }
+
+
+    @Test
     @DisplayName("Expense Group | toString() should include normalized name")
     void expenseGroupNameToStringShouldIncludeNormalizedNameTest() {
         String rawInput = "  test-expense-group  ";
