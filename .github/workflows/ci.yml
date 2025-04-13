@@ -1,48 +1,13 @@
 name: CI Test [Mutation, Coverage, Integration and More]
 
 on:
-  push:
-    branches: [main]
+#  push:
+#    branches: [main]
   workflow_dispatch:
 
 jobs:
   setup:
     runs-on: ubuntu-latest
-    outputs:
-      sha: ${{ github.sha }}
-    steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v4
-
-      - name: 🧱 Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: ☕ Set up Java 21
-        id: setup-java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: 💾 Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
-
-      - name: 🧠 Verify Java and Gradle
-        run: |
-          java -version
-          ./gradlew --version
-
-  unit-tests:
-    needs: setup
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    name: 🧪 Unit Tests
     steps:
       - uses: actions/checkout@v4
       - run: chmod +x gradlew
@@ -50,74 +15,13 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      - name: Run Unit Tests
-        run: ./gradlew test -Djunit.jupiter.tags.exclude=integration
-
-      - name: 📊 Generate JaCoCo Report
-        run: ./gradlew jacocoTestReport
-
-      - name: ☂️ Generate Layered Coverage Badges
-        uses: cicirello/jacoco-badge-generator@v2
+      - uses: actions/cache@v3
         with:
-          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
-          classes-to-analyze: |
-            io.github.sardul3.domain.*
-            io.github.sardul3.application.*
-            io.github.sardul3.adapter.*
-          badge-directory: .github/badges
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: coverage-badges
-          path: .github/badges
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-report
-          path: build/reports/tests/test/
-
-  integration-tests:
-    needs: setup
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: testdb
-        ports: [5432:5432]
-        options: >-
-          --health-cmd "pg_isready -U test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    name: 🔌 Integration Tests (Testcontainers)
-    env:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
-      SPRING_DATASOURCE_USERNAME: test
-      SPRING_DATASOURCE_PASSWORD: test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Run Integration Tests
-        run: ./gradlew integrationTest
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: integration-test-report
-          path: build/reports/tests/test/
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
 
   mutation-tests:
     needs: setup
@@ -135,7 +39,7 @@ jobs:
       - name: 🧬 Run PIT
         run: ./gradlew pitest
 
-      - name: 📄 Parse mutation-report.xml and generate summary + badge
+      - name: 📄 Generate mutation summary and badge
         run: |
           FILE="build/reports/pitest/mutations.xml"
           SUMMARY_DIR="mutation-summary"
@@ -153,7 +57,7 @@ jobs:
               RATE="0.00"
             fi
 
-            # Markdown summary
+            # Create summary
             {
               echo "### PIT Mutation Summary"
               echo ""
@@ -163,60 +67,47 @@ jobs:
               echo "- 🎯 Mutation Score: **$RATE%**"
             } > "$SUMMARY_DIR/summary.md"
 
-            # Badge
-            echo "![mutation](https://img.shields.io/badge/Mutation-${RATE}%25-brightgreen)" > "$BADGE_DIR/mutation-badge.md"
-
-            echo "✅ Generated mutation summary and badge at: $SUMMARY_DIR + $BADGE_DIR"
+            # Create badge
+            echo "![mutation](https://img.shields.io/badge/Mutation-${RATE//./%2E}%25-brightgreen)" > "$BADGE_DIR/mutation-badge.md"
           else
-            echo "⚠️ No mutation-report.xml found"
             echo "No mutation-report.xml found" > "$SUMMARY_DIR/summary.md"
             echo "![mutation](https://img.shields.io/badge/Mutation-unknown-lightgrey)" > "$BADGE_DIR/mutation-badge.md"
           fi
 
-      - name: 📂 Upload mutation HTML report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: mutation-html-report
-          path: build/reports/pitest/
+          name: mutation-summary
+          path: mutation-summary/summary.md
 
-      - name: 🗃️ Upload summary + badge
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: mutation-summary-badges
-          path: |
-            mutation-summary/summary.md
-            .github/badges/mutation-badge.md
+          name: mutation-badge
+          path: .github/badges/mutation-badge.md
 
   store-badges:
-    needs: [unit-tests, mutation-tests]
+    needs: [mutation-tests]
     runs-on: ubuntu-latest
     name: 🗃️ Store Combined Badges
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download coverage badges
+      - name: Download mutation badge
         uses: actions/download-artifact@v4
         with:
-          name: coverage-badges
+          name: mutation-badge
           path: .github/badges
 
-      - name: Download mutation badges
+      - name: Download mutation summary
         uses: actions/download-artifact@v4
         with:
-          name: mutation-badges
-          path: .github/badges
+          name: mutation-summary
+          path: mutation-summary
 
-      - name: Copy badge files to archive directory
-        run: |
-          mkdir -p badges
-          if compgen -G ".github/badges/*" > /dev/null; then
-            cp .github/badges/* badges/
-          else
-            echo "No badge files found to copy."
-          fi
+      - name: Set permissions for badges
+        run: chmod -R u+w .github/badges
 
-      - name: 📦 Archive all badges
+      - name: Archive all badges
         uses: actions/upload-artifact@v4
         with:
           name: combined-badges
-          path: badges
+          path: .github/badges
