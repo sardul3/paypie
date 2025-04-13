@@ -151,8 +151,13 @@ jobs:
 
       - name: Copy badge files
         run: |
+          mkdir -p .github/badges
           mkdir -p badges
-          cp -r .github/badges/* badges/
+          if compgen -G ".github/badges/*" > /dev/null; then
+            cp .github/badges/* badges/
+          else
+            echo "No badge files found to copy."
+          fi
 
       - uses: peaceiris/actions-gh-pages@v3
         with:
