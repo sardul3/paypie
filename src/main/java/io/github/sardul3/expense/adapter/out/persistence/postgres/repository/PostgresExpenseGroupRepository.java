@@ -4,8 +4,11 @@ import io.github.sardul3.expense.adapter.common.SecondaryAdapter;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.ExpenseGroupEntity;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
+import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @SecondaryAdapter
 @Component
@@ -33,5 +36,15 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
                         .build();
         expenseGroupJpaRepository.save(expenseGroupEntity);
         return expenseGroup;
+    }
+
+    @Override
+    public List<ExpenseGroup> findAll() {
+        return expenseGroupJpaRepository.findAll()
+                .stream()
+                .map(entry -> {
+                    return ExpenseGroup.from(GroupName.withName( entry.getName()), Participant.withEmail(entry.getCreatedBy()));
+                })
+                .toList();
     }
 }

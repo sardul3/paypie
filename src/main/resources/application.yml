@@ -14,3 +14,4 @@ server:
   tomcat:
     threads:
       max: 10
+
