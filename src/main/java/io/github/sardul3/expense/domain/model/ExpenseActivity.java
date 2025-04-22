@@ -14,6 +14,7 @@ public class ExpenseActivity {
     private final String description;
     private final Money amount;
 
+
     private ExpenseActivity(String description, Money amount) {
         this.description = description;
         this.amount = amount;

@@ -1,7 +1,9 @@
 package io.github.sardul3;
 
 import io.github.sardul3.expense.domain.model.ExpenseActivity;
+import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.Money;
+import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +19,8 @@ class ExpenseActivityTest {
     @Test
     @DisplayName("Expense Activity | Expense should be created with name and amount")
     void expenseActivityShouldBeCreatedWithNameAndAmount() {
-        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN));
+        Participant paidBy = Participant.withEmail("user@group1.com");
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy.getParticipantId());
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", "grocery")
@@ -32,7 +35,7 @@ class ExpenseActivityTest {
         BigDecimal zeroAmount = BigDecimal.ZERO;
 
         // Act & Assert
-        assertThatThrownBy(() -> ExpenseActivity.from(category, Money.of(zeroAmount)))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, Money.of(zeroAmount), ParticipantId.generate()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Expense amount must be positive and non-zero");
     }
@@ -42,7 +45,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldRejectNegativeMoneyAmount() {
         BigDecimal negative = BigDecimal.valueOf(-1);
         assertThrows(IllegalArgumentException.class,
-                () -> ExpenseActivity.from("grocery", Money.of(negative)));
+                () -> ExpenseActivity.from("grocery", Money.of(negative), ParticipantId.generate()));
     }
 
     @Test
@@ -50,7 +53,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldRejectEmptyDescription() {
         String category = "";
         Money money = Money.of(BigDecimal.TEN);
-        assertThatThrownBy(() -> ExpenseActivity.from(category, money))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money, ParticipantId.generate()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be empty");
     }
@@ -60,7 +63,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldRejectNullDescription() {
         String category = null;
         Money money = Money.of(BigDecimal.TEN);
-        assertThatThrownBy(() -> ExpenseActivity.from(category, money))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money, ParticipantId.generate()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be null");
     }
@@ -71,7 +74,7 @@ class ExpenseActivityTest {
         final int maxValidDescriptionLength = 50;
         String category = "g".repeat(maxValidDescriptionLength + 1);
         Money money = Money.of(BigDecimal.TEN);
-        assertThatThrownBy(() -> ExpenseActivity.from(category, money))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money, ParticipantId.generate()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be longer than 50 characters");
     }
@@ -82,13 +85,15 @@ class ExpenseActivityTest {
         final int maxValidDescriptionLength = 50;
         String category = "g".repeat(maxValidDescriptionLength);
         Money money = Money.of(BigDecimal.TEN);
+        Participant paidBy = Participant.withEmail("user@group1.com");
 
-        ExpenseActivity activity = ExpenseActivity.from(category, money);
+        ExpenseActivity activity = ExpenseActivity.from(category, money, paidBy.getParticipantId());
 
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", category)
-                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
+                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN))
+                .hasFieldOrPropertyWithValue("paidBy", paidBy.getParticipantId());
     }
 
     @Test
@@ -97,13 +102,16 @@ class ExpenseActivityTest {
         final int maxValidDescriptionLength = 50;
         String category = "g".repeat(maxValidDescriptionLength - 10);
         Money money = Money.of(BigDecimal.TEN);
+        Participant paidBy = Participant.withEmail("user@group1.com");
 
-        ExpenseActivity activity = ExpenseActivity.from(category, money);
+        ExpenseActivity activity = ExpenseActivity.from(category, money, paidBy.getParticipantId());
 
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", category)
-                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
+                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN))
+                .hasFieldOrPropertyWithValue("paidBy", paidBy.getParticipantId());
+
     }
 
 
