@@ -1,7 +1,13 @@
 package io.github.sardul3.expense.domain.model;
 
+import io.github.sardul3.expense.domain.common.annotation.DomainEntity;
 import io.github.sardul3.expense.domain.valueobject.Money;
 
+@DomainEntity(
+        description = "Represents an activity in the expense group, with description and amount",
+        boundedContext = "expense-management",
+        isAggregateRoot = false
+)
 public class ExpenseActivity {
     private static final int MAX_DESCRIPTION_LENGTH = 50;
 
