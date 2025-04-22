@@ -2,6 +2,7 @@ package io.github.sardul3.expense.domain.model;
 
 import io.github.sardul3.expense.domain.common.annotation.DomainEntity;
 import io.github.sardul3.expense.domain.valueobject.Money;
+import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 @DomainEntity(
         description = "Represents an activity in the expense group, with description and amount",
@@ -13,17 +14,18 @@ public class ExpenseActivity {
 
     private final String description;
     private final Money amount;
+    private final ParticipantId paidBy;
 
-
-    private ExpenseActivity(String description, Money amount) {
+    private ExpenseActivity(String description, Money amount, ParticipantId paidBy) {
         this.description = description;
         this.amount = amount;
+        this.paidBy = paidBy;
     }
 
-    public static ExpenseActivity from(String description, Money amount) {
+    public static ExpenseActivity from(String description, Money amount, ParticipantId paidBy) {
         validateExpenseAmount(amount);
         validateExpenseDescription(description);
-        return new ExpenseActivity(description, amount);
+        return new ExpenseActivity(description, amount, paidBy);
     }
 
     private static void validateExpenseAmount(Money amount) {
