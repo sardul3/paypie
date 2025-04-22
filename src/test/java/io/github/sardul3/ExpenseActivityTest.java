@@ -48,11 +48,21 @@ class ExpenseActivityTest {
     @Test
     @DisplayName("Expense Activity | Expense description cannot be empty")
     void expenseActivityShouldRejectEmptyDescription() {
-        String category = "grocery";
+        String category = "";
         Money money = Money.of(BigDecimal.TEN);
         assertThatThrownBy(() -> ExpenseActivity.from(category, money))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be empty");
+    }
+
+    @Test
+    @DisplayName("Expense Activity | Expense description cannot be null")
+    void expenseActivityShouldRejectNullDescription() {
+        String category = null;
+        Money money = Money.of(BigDecimal.TEN);
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("description cannot be null");
     }
 
     @Test
@@ -63,7 +73,7 @@ class ExpenseActivityTest {
         Money money = Money.of(BigDecimal.TEN);
         assertThatThrownBy(() -> ExpenseActivity.from(category, money))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("description cannot more than 50 characters long");
+                .hasMessageContaining("description cannot be longer than 50 characters");
     }
 
     @Test
