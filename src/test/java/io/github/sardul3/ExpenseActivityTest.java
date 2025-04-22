@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertThrows;
 
 
@@ -24,10 +25,16 @@ class ExpenseActivityTest {
     }
 
     @Test
-    @DisplayName("Expense Activity | Expense amount cannot be $0")
-    void expenseActivityShouldRejectZeroAsMoneyAmount() {
-        assertThrows(IllegalArgumentException.class,
-                () -> ExpenseActivity.from("grocery", Money.of(BigDecimal.ZERO)));
+    @DisplayName("ExpenseActivity.from() should throw IllegalArgumentException when money amount is zero")
+    void shouldThrowExceptionWhenMoneyAmountIsZero() {
+        // Arrange
+        String category = "grocery";
+        BigDecimal zeroAmount = BigDecimal.ZERO;
+
+        // Act & Assert
+        assertThatThrownBy(() -> ExpenseActivity.from(category, Money.of(zeroAmount)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Expense amount must be positive and non-zero");
     }
 
     @Test
@@ -37,4 +44,6 @@ class ExpenseActivityTest {
         assertThrows(IllegalArgumentException.class,
                 () -> ExpenseActivity.from("grocery", Money.of(negative)));
     }
+
+
 }

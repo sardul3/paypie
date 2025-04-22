@@ -12,7 +12,12 @@ public class ExpenseActivity {
     }
 
     public static ExpenseActivity from(String description, Money amount) {
+        if(amount.isNotPositive()) {
+           throw new IllegalArgumentException("Expense amount must be positive and non-zero");
+        }
         return new ExpenseActivity(description, amount);
     }
+
+
 
 }
