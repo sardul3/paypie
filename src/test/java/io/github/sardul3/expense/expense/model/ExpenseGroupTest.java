@@ -1,11 +1,15 @@
 package io.github.sardul3.expense.expense.model;
 
+import io.github.sardul3.expense.domain.model.ExpenseActivity;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
+import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -164,5 +168,45 @@ public class ExpenseGroupTest {
 
         assertThat(expenseGroup.getGroupCreator()).isNotNull();
         assertThat(expenseGroup.getGroupCreator().getEmail()).isEqualTo("user@example.com");
+    }
+
+    @Test
+    void expenseGroupShouldAcceptActivitesFromRegisteredMembers() {
+        String activityDescription = "This is a test activity";
+        Money activityAmount = Money.of(BigDecimal.TEN);
+        Participant paidBy = Participant.withEmail("user@example.com");
+        ParticipantId paidById = paidBy.getParticipantId();
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, paidById);
+
+        GroupName groupName = GroupName.withName("demo");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, paidBy);
+
+        Participant anotherParticipant = Participant.withEmail("another@example.com");
+        expenseGroup.addParticipant(anotherParticipant.getParticipantId());
+
+        expenseGroup.addActivity(activity, anotherParticipant.getParticipantId());
+
+        assertThat(expenseGroup.getActivities())
+                .hasSize(1);
+
+    }
+
+    @Test
+    void expenseGroupShouldRejectActivitesFromUnknownMembers() {
+        String activityDescription = "This is a test activity";
+        Money activityAmount = Money.of(BigDecimal.TEN);
+        Participant paidBy = Participant.withEmail("user@example.com");
+        ParticipantId paidById = paidBy.getParticipantId();
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, paidById);
+
+        GroupName groupName = GroupName.withName("demo");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, paidBy);
+
+        Participant anotherParticipant = Participant.withEmail("another@example.com");
+        expenseGroup.addParticipant(anotherParticipant.getParticipantId());
+
+        Participant unknownParticipant = Participant.withEmail("unknown@example.com");
+
+        assertThrows(Exception.class, () -> expenseGroup.addActivity(activity, unknownParticipant.getParticipantId()));
     }
 }
