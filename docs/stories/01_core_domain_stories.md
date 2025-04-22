@@ -8,7 +8,7 @@
 **So that** I can start tracking shared expenses with my friends
 
 #### Acceptance Criteria
-1. Group must have a unique name
+1. Group must have a unique name 
 2. Group must have at least 2 participants
 3. Each participant must have a valid email
 4. Initial group balance should be zero
@@ -82,10 +82,10 @@ void shouldInitializeWithZeroBalance()
 **So that** more people can share expenses
 
 #### Acceptance Criteria
-1. Only existing group members can add new participants
+1. Only existing group members can add new participants [Not Implemented yet]
 2. Cannot add duplicate participants
 3. New participants start with zero balance
-4. All existing members should be notified
+4. All existing members should be notified [No event handling yet]
 
 #### TDD Tasks
 
