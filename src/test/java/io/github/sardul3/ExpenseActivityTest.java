@@ -45,5 +45,57 @@ class ExpenseActivityTest {
                 () -> ExpenseActivity.from("grocery", Money.of(negative)));
     }
 
+    @Test
+    @DisplayName("Expense Activity | Expense description cannot be empty")
+    void expenseActivityShouldRejectEmptyDescription() {
+        String category = "grocery";
+        Money money = Money.of(BigDecimal.TEN);
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("description cannot be empty");
+    }
+
+    @Test
+    @DisplayName("Expense Activity | Expense description cannot be more than 50 characters long")
+    void expenseActivityShouldRejectAVeryLongDescription() {
+        final int maxValidDescriptionLength = 50;
+        String category = "g".repeat(maxValidDescriptionLength + 1);
+        Money money = Money.of(BigDecimal.TEN);
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("description cannot more than 50 characters long");
+    }
+
+    @Test
+    @DisplayName("Expense Activity | Expense description validation should pass when exactly 50 characters long")
+    void expenseActivityShouldAcceptBorderLineLegalDescription() {
+        final int maxValidDescriptionLength = 50;
+        String category = "g".repeat(maxValidDescriptionLength);
+        Money money = Money.of(BigDecimal.TEN);
+
+        ExpenseActivity activity = ExpenseActivity.from(category, money);
+
+        assertThat(activity)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("description", category)
+                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
+    }
+
+    @Test
+    @DisplayName("Expense Activity | Expense description that is valid should create new instance of expense-activity")
+    void expenseActivityShouldAcceptAValidExpenseDescription() {
+        final int maxValidDescriptionLength = 50;
+        String category = "g".repeat(maxValidDescriptionLength - 10);
+        Money money = Money.of(BigDecimal.TEN);
+
+        ExpenseActivity activity = ExpenseActivity.from(category, money);
+
+        assertThat(activity)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("description", category)
+                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
+    }
+
+
 
 }
