@@ -22,6 +22,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     private final Participant groupCreator;
     private boolean isActivated = false;
     private List<ParticipantId> participants;
+    private List<ExpenseActivity> activities;
 
     private ExpenseGroup(ExpenseGroupId expenseGroupId , GroupName groupName, Participant groupCreator) {
         super(expenseGroupId);
@@ -29,6 +30,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         this.groupCreator = groupCreator;
         this.participants = new ArrayList<>();
         this.participants.add(groupCreator.getParticipantId());
+        this.activities = new ArrayList<>();
     }
 
     public static ExpenseGroup from(GroupName groupName, Participant creator) {
@@ -37,6 +39,39 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
                 groupName,
                 creator
         );
+    }
+
+    public void addParticipant(ParticipantId participantId) {
+        if(this.participants.contains(participantId)) {
+            throw new IllegalArgumentException("Participant " + participantId + " already exists in the expense group");
+        }
+        this.participants.add(participantId);
+    }
+
+    public void activate() {
+        if(this.participants.size() < MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION) {
+            throw new IllegalStateException("Group cannot be activated as it has less than " + MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION + " members");
+        }
+        this.isActivated = true;
+    }
+
+    public void addActivity(ExpenseActivity expenseActivity) {
+        ParticipantId activityCreatedBy = expenseActivity.getPaidBy();
+        if(!this.participants.contains(activityCreatedBy)) {
+            throw new IllegalArgumentException("Participant " + activityCreatedBy + " does not exist in the expense group");
+        }
+        if(this.activities.contains(expenseActivity)) {
+            throw new IllegalArgumentException("Activity " + expenseActivity + " already exists in the expense group");
+        }
+        this.activities.add(expenseActivity);
+    }
+
+    public List<ExpenseActivity> getActivities() {
+        return activities;
+    }
+
+    public List<ParticipantId> getParticipants() {
+        return participants;
     }
 
     public GroupName getGroupName() {
@@ -51,21 +86,4 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         return groupCreator;
     }
 
-    public void addParticipant(ParticipantId participantId) {
-        if(this.participants.contains(participantId)) {
-            throw new IllegalArgumentException("Participant " + participantId + " already exists in the expense group");
-        }
-        this.participants.add(participantId);
-    }
-
-    public List<ParticipantId> getParticipants() {
-        return participants;
-    }
-
-    public void activate() {
-        if(this.participants.size() < MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION) {
-            throw new IllegalStateException("Group cannot be activated as it has less than " + MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION + " members");
-        }
-        this.isActivated = true;
-    }
 }

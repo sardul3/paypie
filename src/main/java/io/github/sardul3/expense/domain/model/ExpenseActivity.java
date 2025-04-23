@@ -46,5 +46,7 @@ public class ExpenseActivity {
         }
     }
 
-
+    public ParticipantId getPaidBy() {
+        return paidBy;
+    }
 }
