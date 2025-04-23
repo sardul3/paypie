@@ -2,6 +2,7 @@ package io.github.sardul3;
 
 import io.github.sardul3.expense.domain.model.ExpenseActivity;
 import io.github.sardul3.expense.domain.model.Participant;
+import io.github.sardul3.expense.domain.valueobject.ExpenseSplit;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertThrows;
+import static org.springframework.data.util.Predicates.isTrue;
 
 
 class ExpenseActivityTest {
@@ -25,6 +27,22 @@ class ExpenseActivityTest {
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", "grocery")
                 .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
+    }
+
+    @Test
+    @DisplayName("Expense Activity | Expense should be created with default split strategy")
+    void expenseActivityShouldBeCreatedWithDefaultSplitStrategy() {
+        Participant paidBy = Participant.withEmail("user@group1.com");
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy.getParticipantId());
+        assertThat(activity)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("description", "grocery")
+                .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
+
+        assertThat(activity)
+                .extracting(ExpenseActivity::getExpenseSplit)
+                .extracting(ExpenseSplit::isSplitEvenlyForAllMembers)
+                .isTrue();
     }
 
     @Test
