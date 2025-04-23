@@ -15,18 +15,18 @@ public class ExpenseActivity {
 
     private final String description;
     private final Money amount;
-    private final ParticipantId paidBy;
+    private final Participant paidBy;
 
     private ExpenseSplit split;
 
-    private ExpenseActivity(String description, Money amount, ParticipantId paidBy) {
+    private ExpenseActivity(String description, Money amount, Participant paidBy) {
         this.description = description;
         this.amount = amount;
         this.paidBy = paidBy;
         this.split = new ExpenseSplit(true);
     }
 
-    public static ExpenseActivity from(String description, Money amount, ParticipantId paidBy) {
+    public static ExpenseActivity from(String description, Money amount, Participant paidBy) {
         validateExpenseAmount(amount);
         validateExpenseDescription(description);
         return new ExpenseActivity(description, amount, paidBy);
@@ -50,11 +50,15 @@ public class ExpenseActivity {
         }
     }
 
-    public ParticipantId getPaidBy() {
+    public Participant getPaidBy() {
         return paidBy;
     }
 
     public ExpenseSplit getSplit() {
         return split;
+    }
+
+    public void setSplit(ExpenseSplit split) {
+        this.split = split;
     }
 }

@@ -62,7 +62,7 @@ public class ExpenseGroupTest {
         );
 
         ParticipantId participantId = participant.getId();
-        expenseGroup.addParticipant(participantId);
+        expenseGroup.addParticipant(participant);
 
         assertThat(expenseGroup.getParticipants().size())
                 .isEqualTo(2);
@@ -81,7 +81,7 @@ public class ExpenseGroupTest {
         assertThat(expenseGroup.getParticipants().size())
                 .isEqualTo(1);
 
-        assertThat(expenseGroup.getParticipants().get(0).getId())
+        assertThat(expenseGroup.getParticipants().get(0).getId().getId())
                 .isEqualTo(createdBy.getParticipantId().getId());
     }
 
@@ -97,7 +97,7 @@ public class ExpenseGroupTest {
         );
 
         ParticipantId creatorId = createdBy.getId();
-        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(creatorId));
+        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(createdBy));
     }
 
     @Test
@@ -111,8 +111,8 @@ public class ExpenseGroupTest {
         );
 
         ParticipantId participantId = participant.getId();
-        expenseGroup.addParticipant(participantId);
-        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participantId));
+        expenseGroup.addParticipant(participant);
+        assertThrows(IllegalArgumentException.class, () -> expenseGroup.addParticipant(participant));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class ExpenseGroupTest {
 
         Participant participant = Participant.withEmail("user@example.com");
         ParticipantId participantId = participant.getId();
-        expenseGroup.addParticipant(participantId);
+        expenseGroup.addParticipant(participant);
         expenseGroup.activate();
 
         assertThat(expenseGroup.getParticipants().size())
@@ -177,13 +177,13 @@ public class ExpenseGroupTest {
         Money activityAmount = Money.of(BigDecimal.TEN);
         Participant paidBy = Participant.withEmail("user@example.com");
         ParticipantId paidById = paidBy.getParticipantId();
-        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, paidById);
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, paidBy);
 
         GroupName groupName = GroupName.withName("demo");
         ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, paidBy);
 
         Participant anotherParticipant = Participant.withEmail("another@example.com");
-        expenseGroup.addParticipant(anotherParticipant.getParticipantId());
+        expenseGroup.addParticipant(anotherParticipant);
 
         expenseGroup.addActivity(activity);
 
@@ -202,10 +202,10 @@ public class ExpenseGroupTest {
         ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, paidBy);
 
         Participant anotherParticipant = Participant.withEmail("another@example.com");
-        expenseGroup.addParticipant(anotherParticipant.getParticipantId());
+        expenseGroup.addParticipant(anotherParticipant);
 
         Participant unknownParticipant = Participant.withEmail("unknown@example.com");
-        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, unknownParticipant.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, unknownParticipant);
 
         assertThatThrownBy(() -> expenseGroup.addActivity(activity))
         .isInstanceOf(IllegalArgumentException.class)
@@ -222,9 +222,9 @@ public class ExpenseGroupTest {
         ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, paidBy);
 
         Participant anotherParticipant = Participant.withEmail("another@example.com");
-        expenseGroup.addParticipant(anotherParticipant.getParticipantId());
+        expenseGroup.addParticipant(anotherParticipant);
 
-        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, anotherParticipant.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, anotherParticipant);
 
         expenseGroup.addActivity(activity);
 

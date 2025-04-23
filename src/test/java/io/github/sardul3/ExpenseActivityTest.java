@@ -23,7 +23,7 @@ class ExpenseActivityTest {
     @DisplayName("Expense Activity | Expense should be created with name and amount")
     void expenseActivityShouldBeCreatedWithNameAndAmount() {
         Participant paidBy = Participant.withEmail("user@group1.com");
-        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), Participant.withEmail("user@group2.com"));
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", "grocery")
@@ -34,7 +34,7 @@ class ExpenseActivityTest {
     @DisplayName("Expense Activity | Expense should be created with default split strategy")
     void expenseActivityShouldBeCreatedWithDefaultSplitStrategy() {
         Participant paidBy = Participant.withEmail("user@group1.com");
-        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy);
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", "grocery")
@@ -50,7 +50,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldEnableSettingDifferentSplitStrategy() {
         Participant paidBy = Participant.withEmail("user@group1.com");
         Participant groupMember = Participant.withEmail("user1@group1.com");
-        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy);
 
         ExpenseSplit split = new ExpenseSplit(false);
         split.setSplitMembers(List.of(paidBy.getParticipantId(), groupMember.getParticipantId()));
@@ -70,7 +70,7 @@ class ExpenseActivityTest {
         BigDecimal zeroAmount = BigDecimal.ZERO;
 
         // Act & Assert
-        assertThatThrownBy(() -> ExpenseActivity.from(category, Money.of(zeroAmount), ParticipantId.generate()))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, Money.of(zeroAmount), Participant.withEmail("user@group1.com")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Expense amount must be positive and non-zero");
     }
@@ -80,7 +80,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldRejectNegativeMoneyAmount() {
         BigDecimal negative = BigDecimal.valueOf(-1);
         assertThrows(IllegalArgumentException.class,
-                () -> ExpenseActivity.from("grocery", Money.of(negative), ParticipantId.generate()));
+                () -> ExpenseActivity.from("grocery", Money.of(negative), Participant.withEmail("user@group1.com")));
     }
 
     @Test
@@ -88,7 +88,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldRejectEmptyDescription() {
         String category = "";
         Money money = Money.of(BigDecimal.TEN);
-        assertThatThrownBy(() -> ExpenseActivity.from(category, money, ParticipantId.generate()))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money, Participant.withEmail("user@group1.com")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be empty");
     }
@@ -98,7 +98,7 @@ class ExpenseActivityTest {
     void expenseActivityShouldRejectNullDescription() {
         String category = null;
         Money money = Money.of(BigDecimal.TEN);
-        assertThatThrownBy(() -> ExpenseActivity.from(category, money, ParticipantId.generate()))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money, Participant.withEmail("user@group1.com")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be null");
     }
@@ -109,7 +109,7 @@ class ExpenseActivityTest {
         final int maxValidDescriptionLength = 50;
         String category = "g".repeat(maxValidDescriptionLength + 1);
         Money money = Money.of(BigDecimal.TEN);
-        assertThatThrownBy(() -> ExpenseActivity.from(category, money, ParticipantId.generate()))
+        assertThatThrownBy(() -> ExpenseActivity.from(category, money, Participant.withEmail("user@group1.com")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("description cannot be longer than 50 characters");
     }
@@ -122,13 +122,15 @@ class ExpenseActivityTest {
         Money money = Money.of(BigDecimal.TEN);
         Participant paidBy = Participant.withEmail("user@group1.com");
 
-        ExpenseActivity activity = ExpenseActivity.from(category, money, paidBy.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from(category, money, paidBy);
 
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", category)
                 .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN))
-                .hasFieldOrPropertyWithValue("paidBy", paidBy.getParticipantId());
+                .extracting(ExpenseActivity::getPaidBy)
+                .extracting(Participant::getParticipantId)
+                .isEqualTo(paidBy.getParticipantId());
     }
 
     @Test
@@ -139,13 +141,15 @@ class ExpenseActivityTest {
         Money money = Money.of(BigDecimal.TEN);
         Participant paidBy = Participant.withEmail("user@group1.com");
 
-        ExpenseActivity activity = ExpenseActivity.from(category, money, paidBy.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from(category, money, paidBy);
 
         assertThat(activity)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("description", category)
                 .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN))
-                .hasFieldOrPropertyWithValue("paidBy", paidBy.getParticipantId());
+                .extracting(ExpenseActivity::getPaidBy)
+                .extracting(Participant::getParticipantId)
+                .isEqualTo(paidBy.getParticipantId());
 
     }
 

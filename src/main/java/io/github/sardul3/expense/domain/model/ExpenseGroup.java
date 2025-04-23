@@ -21,7 +21,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     private final GroupName groupName;
     private final Participant groupCreator;
     private boolean isActivated = false;
-    private List<ParticipantId> participants;
+    private List<Participant> participants;
     private List<ExpenseActivity> activities;
 
     private ExpenseGroup(ExpenseGroupId expenseGroupId , GroupName groupName, Participant groupCreator) {
@@ -29,7 +29,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         this.groupName = groupName;
         this.groupCreator = groupCreator;
         this.participants = new ArrayList<>();
-        this.participants.add(groupCreator.getParticipantId());
+        this.participants.add(groupCreator);
         this.activities = new ArrayList<>();
     }
 
@@ -41,11 +41,11 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         );
     }
 
-    public void addParticipant(ParticipantId participantId) {
-        if(this.participants.contains(participantId)) {
-            throw new IllegalArgumentException("Participant " + participantId + " already exists in the expense group");
+    public void addParticipant(Participant participant) {
+        if(this.participants.contains(participant)) {
+            throw new IllegalArgumentException("Participant " + participant + " already exists in the expense group");
         }
-        this.participants.add(participantId);
+        this.participants.add(participant);
     }
 
     public void activate() {
@@ -56,7 +56,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     }
 
     public void addActivity(ExpenseActivity expenseActivity) {
-        ParticipantId activityCreatedBy = expenseActivity.getPaidBy();
+        Participant activityCreatedBy = expenseActivity.getPaidBy();
         if(!this.participants.contains(activityCreatedBy)) {
             throw new IllegalArgumentException("Participant " + activityCreatedBy + " does not exist in the expense group");
         }
@@ -70,7 +70,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         return activities;
     }
 
-    public List<ParticipantId> getParticipants() {
+    public List<Participant> getParticipants() {
         return participants;
     }
 
