@@ -1,6 +1,7 @@
 package io.github.sardul3.expense.domain.model;
 
 import io.github.sardul3.expense.domain.common.annotation.DomainEntity;
+import io.github.sardul3.expense.domain.valueobject.ExpenseSplit;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
@@ -16,10 +17,13 @@ public class ExpenseActivity {
     private final Money amount;
     private final ParticipantId paidBy;
 
+    private ExpenseSplit split;
+
     private ExpenseActivity(String description, Money amount, ParticipantId paidBy) {
         this.description = description;
         this.amount = amount;
         this.paidBy = paidBy;
+        this.split = new ExpenseSplit(true);
     }
 
     public static ExpenseActivity from(String description, Money amount, ParticipantId paidBy) {
@@ -48,5 +52,9 @@ public class ExpenseActivity {
 
     public ParticipantId getPaidBy() {
         return paidBy;
+    }
+
+    public ExpenseSplit getSplit() {
+        return split;
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
         boundedContext = "expense-management"
 )
 public class ExpenseSplit {
-    private final boolean splitEvenlyForAllMembers;
+    private  boolean splitEvenlyForAllMembers;
     private List<ParticipantId> splitMembers;
 
     public ExpenseSplit(boolean splitEvenlyForAllMembers) {
@@ -26,5 +26,9 @@ public class ExpenseSplit {
 
     public void setSplitMembers(List<ParticipantId> splitMembers) {
         this.splitMembers = splitMembers;
+    }
+
+    public void setSplitEvenlyForAllMembers() {
+        this.splitEvenlyForAllMembers = Boolean.TRUE;
     }
 }

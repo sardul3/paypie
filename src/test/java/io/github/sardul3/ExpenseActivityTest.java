@@ -40,9 +40,9 @@ class ExpenseActivityTest {
                 .hasFieldOrPropertyWithValue("amount", Money.of(BigDecimal.TEN));
 
         assertThat(activity)
-                .extracting(ExpenseActivity::getExpenseSplit)
+                .extracting(ExpenseActivity::getSplit)
                 .extracting(ExpenseSplit::isSplitEvenlyForAllMembers)
-                .isTrue();
+                .isEqualTo(true);
     }
 
     @Test
