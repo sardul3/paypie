@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -43,6 +44,22 @@ class ExpenseActivityTest {
                 .extracting(ExpenseActivity::getSplit)
                 .extracting(ExpenseSplit::isSplitEvenlyForAllMembers)
                 .isEqualTo(true);
+    }
+
+    @Test
+    void expenseActivityShouldEnableSettingDifferentSplitStrategy() {
+        Participant paidBy = Participant.withEmail("user@group1.com");
+        Participant groupMember = Participant.withEmail("user1@group1.com");
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy.getParticipantId());
+
+        ExpenseSplit split = new ExpenseSplit(false);
+        split.setSplitMembers(List.of(paidBy.getParticipantId(), groupMember.getParticipantId()));
+        activity.setSplit(split);
+
+        assertThat(activity)
+                .extracting(ExpenseActivity::getSplit)
+                .extracting(ExpenseSplit::isSplitEvenlyForAllMembers)
+                .isEqualTo(false);
     }
 
     @Test
