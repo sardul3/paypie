@@ -14,8 +14,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.Assert.assertThrows;
-import static org.springframework.data.util.Predicates.isTrue;
-
 
 class ExpenseActivityTest {
 

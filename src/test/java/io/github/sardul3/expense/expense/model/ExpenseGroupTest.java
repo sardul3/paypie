@@ -172,6 +172,21 @@ public class ExpenseGroupTest {
     }
 
     @Test
+    void expenseGroupShouldRejectActivitiesForAnInactiveGroup() {
+        GroupName groupName = GroupName.withName("demo");
+        Participant createdBy = Participant.withEmail("user@example.com");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, createdBy);
+
+        String activityDescription = "This is a test activity";
+        Money activityAmount = Money.of(BigDecimal.TEN);
+        Participant paidBy = Participant.withEmail("user@example.com");
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, paidBy);
+
+        assertThatThrownBy(() -> expenseGroup.addActivity(activity))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     void expenseGroupShouldAcceptActivitesFromRegisteredMembers() {
         String activityDescription = "This is a test activity";
         Money activityAmount = Money.of(BigDecimal.TEN);
