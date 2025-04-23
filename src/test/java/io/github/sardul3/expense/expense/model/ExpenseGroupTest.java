@@ -200,6 +200,7 @@ public class ExpenseGroupTest {
         Participant anotherParticipant = Participant.withEmail("another@example.com");
         expenseGroup.addParticipant(anotherParticipant);
 
+        expenseGroup.activate();
         expenseGroup.addActivity(activity);
 
         assertThat(expenseGroup.getActivities())
@@ -222,6 +223,7 @@ public class ExpenseGroupTest {
         Participant unknownParticipant = Participant.withEmail("unknown@example.com");
         ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, unknownParticipant);
 
+        expenseGroup.activate();
         assertThatThrownBy(() -> expenseGroup.addActivity(activity))
         .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("does not exist in the expense group");
@@ -241,6 +243,7 @@ public class ExpenseGroupTest {
 
         ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, anotherParticipant);
 
+        expenseGroup.activate();
         expenseGroup.addActivity(activity);
 
         assertThatThrownBy(() -> expenseGroup.addActivity(activity))

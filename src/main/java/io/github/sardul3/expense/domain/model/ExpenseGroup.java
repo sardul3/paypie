@@ -56,6 +56,9 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     }
 
     public void addActivity(ExpenseActivity expenseActivity) {
+        if(!this.isActivated) {
+            throw new IllegalStateException("Activity cannot be registered as it has not been activated");
+        }
         Participant activityCreatedBy = expenseActivity.getPaidBy();
         if(!this.participants.contains(activityCreatedBy)) {
             throw new IllegalArgumentException("Participant " + activityCreatedBy + " does not exist in the expense group");
