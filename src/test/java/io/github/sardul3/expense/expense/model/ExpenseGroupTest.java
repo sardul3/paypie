@@ -10,9 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -276,6 +278,32 @@ public class ExpenseGroupTest {
                 .extracting(Participant::getBalance)
                 .isEqualTo(new BigDecimal("5.00"));
 
+    }
+
+    @Test
+    @DisplayName("Should handle custom split")
+    void testCustomSplitAffectsOnlySelectedMembers() {
+
+        Participant creator = Participant.withEmail("creator@example.com");
+        Participant participant2 = Participant.withEmail("user2@example.com");
+        Participant participant3 = Participant.withEmail("user3@example.com");
+        ExpenseGroup group = ExpenseGroup.from(GroupName.withName("Trip"), creator);
+        group.addParticipant(participant2);
+        group.addParticipant(participant3);
+        group.activate();
+        List<ParticipantId> splitMembers = List.of(participant2.getParticipantId(), participant3.getParticipantId());
+        ExpenseActivity activity = ExpenseActivity.from(
+                "Lunch", Money.of(BigDecimal.valueOf(100)), creator, splitMembers);
+
+        group.addActivity(activity);
+
+        Money expectedSplit = Money.of(BigDecimal.valueOf(50));
+        Money expectedCredit = Money.of(BigDecimal.valueOf(50)); // 100 - (50 * 1)
+
+        assertEquals(expectedCredit.getAmount(), creator.getBalance());
+        assertEquals(expectedSplit.getAmount().negate(), participant2.getBalance());
+        assertEquals(expectedSplit.getAmount().negate(), participant3.getBalance());
+        assertEquals(BigDecimal.ZERO, creator.getBalance().subtract(expectedCredit.getAmount()));
     }
 
 }
