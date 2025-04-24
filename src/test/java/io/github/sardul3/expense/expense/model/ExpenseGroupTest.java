@@ -250,4 +250,32 @@ public class ExpenseGroupTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("already exists in the expense group");
     }
+
+    @Test
+    void expenseGroupShouldCalculateBalanceForParticipants() {
+        String activityDescription = "This is a test activity";
+        Money activityAmount = Money.of(BigDecimal.TEN);
+        Participant paidBy = Participant.withEmail("user@example.com");
+
+        GroupName groupName = GroupName.withName("demo");
+        ExpenseGroup expenseGroup = ExpenseGroup.from(groupName, paidBy);
+
+        Participant anotherParticipant = Participant.withEmail("another@example.com");
+        expenseGroup.addParticipant(anotherParticipant);
+
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, anotherParticipant);
+
+        expenseGroup.activate();
+        expenseGroup.addActivity(activity);
+
+        assertThat(anotherParticipant)
+                .extracting(Participant::getBalance)
+                .isEqualTo(Money.of(new BigDecimal("5")));
+
+        assertThat(paidBy)
+                .extracting(Participant::getBalance)
+                .isEqualTo(Money.of(new BigDecimal("5")));
+
+    }
+
 }

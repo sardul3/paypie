@@ -56,16 +56,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     }
 
     public void addActivity(ExpenseActivity expenseActivity) {
-        if(!this.isActivated) {
-            throw new IllegalStateException("Activity cannot be registered as it has not been activated");
-        }
-        Participant activityCreatedBy = expenseActivity.getPaidBy();
-        if(!this.participants.contains(activityCreatedBy)) {
-            throw new IllegalArgumentException("Participant " + activityCreatedBy + " does not exist in the expense group");
-        }
-        if(this.activities.contains(expenseActivity)) {
-            throw new IllegalArgumentException("Activity " + expenseActivity + " already exists in the expense group");
-        }
+        validateActivity(expenseActivity);
         this.activities.add(expenseActivity);
     }
 
@@ -89,4 +80,16 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         return groupCreator;
     }
 
+    private void validateActivity(ExpenseActivity expenseActivity) {
+        if(!this.isActivated) {
+            throw new IllegalStateException("Activity cannot be registered as it has not been activated");
+        }
+        Participant activityCreatedBy = expenseActivity.getPaidBy();
+        if(!this.participants.contains(activityCreatedBy)) {
+            throw new IllegalArgumentException("Participant " + activityCreatedBy + " does not exist in the expense group");
+        }
+        if(this.activities.contains(expenseActivity)) {
+            throw new IllegalArgumentException("Activity " + expenseActivity + " already exists in the expense group");
+        }
+    }
 }
