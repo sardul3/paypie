@@ -1,5 +1,6 @@
 package io.github.sardul3.expense.expense.valueobject;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.sardul3.expense.domain.valueobject.Money;
@@ -71,6 +72,34 @@ class MoneyTest {
         Money result = m1.subtract(m2);
 
         assertTrue(result.isNegative());
+    }
+
+    @Test
+    @DisplayName("Money | while adding negative amounts should be rejected")
+    void shouldRejectNegativeAmounts() {
+        Money m1 = Money.of(new BigDecimal("10.00"));
+        Money m2 = Money.of(new BigDecimal("5.50"));
+        assertThatThrownBy(() -> m1.add(Money.of(m2.getAmount().negate())))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Money | should not be able to split it zero ways")
+    void splitCannotBePerformedWithZeroWays() {
+        Money m1 = Money.of(new BigDecimal("100.00"));
+        assertThatThrownBy(() -> m1.split(0))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Money | should be able to split it X ways [>0]")
+    void splitCanBePerformedWithValidWays() {
+        Money m1 = Money.of(new BigDecimal("100.00"));
+        Money m2 = m1.split(2);
+        assertThat(m2)
+                .extracting(Money::getAmount)
+                .extracting(BigDecimal::toString)
+                .isEqualTo("50.00");
     }
 
     @Test

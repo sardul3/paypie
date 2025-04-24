@@ -60,12 +60,6 @@ public class Participant extends BaseEntity<ParticipantId> {
         return balance.getAmount();
     }
 
-    public void setBalance(Money balance) {
-        this.balance = balance;
-    }
-
-
-
     @Override
     public String toString() {
         return "Participant{" +

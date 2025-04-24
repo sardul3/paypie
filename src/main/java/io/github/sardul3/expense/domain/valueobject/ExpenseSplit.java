@@ -1,7 +1,6 @@
 package io.github.sardul3.expense.domain.valueobject;
 
 import io.github.sardul3.expense.domain.common.annotation.ValueObject;
-import io.github.sardul3.expense.domain.model.Participant;
 
 import java.util.List;
 
@@ -27,9 +26,5 @@ public class ExpenseSplit {
 
     public void setSplitMembers(List<ParticipantId> splitMembers) {
         this.splitMembers = splitMembers;
-    }
-
-    public void setSplitEvenlyForAllMembers() {
-        this.splitEvenlyForAllMembers = Boolean.TRUE;
     }
 }
