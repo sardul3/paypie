@@ -114,8 +114,10 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         if (activity.getSplit().isSplitEvenlyForAllMembers()) {
             return new ArrayList<>(participants);
         }
+        List<ParticipantId> splitMembers = new ArrayList<>(activity.getSplit().getSplitMembers());
+        splitMembers.add(activity.getPaidBy().getParticipantId());
         return participants.stream()
-                .filter(p -> activity.getSplit().getSplitMembers().contains(p.getParticipantId()))
+                .filter(p -> splitMembers.contains(p.getParticipantId()))
                 .toList();
     }
 
