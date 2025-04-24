@@ -5,6 +5,8 @@ import io.github.sardul3.expense.domain.valueobject.ExpenseSplit;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
+import java.util.List;
+
 @DomainEntity(
         description = "Represents an activity in the expense group, with description and amount",
         boundedContext = "expense-management",
@@ -24,6 +26,14 @@ public class ExpenseActivity {
         this.amount = amount;
         this.paidBy = paidBy;
         this.split = new ExpenseSplit(true);
+    }
+
+    private ExpenseActivity(String description, Money amount, Participant paidBy, List<ParticipantId> splitMembers) {
+        this.description = description;
+        this.amount = amount;
+        this.paidBy = paidBy;
+        this.split = new ExpenseSplit(false);
+        this.split.setSplitMembers(splitMembers);
     }
 
     public static ExpenseActivity from(String description, Money amount, Participant paidBy) {
@@ -48,6 +58,12 @@ public class ExpenseActivity {
         if(description.length() > MAX_DESCRIPTION_LENGTH) {
             throw new IllegalArgumentException("Expense description cannot be longer than 50 characters");
         }
+    }
+
+    public static ExpenseActivity from(String description, Money amount, Participant paidBy, List<ParticipantId> splitMembers) {
+        validateExpenseAmount(amount);
+        validateExpenseDescription(description);
+        return new ExpenseActivity(description, amount, paidBy, splitMembers);
     }
 
     public Participant getPaidBy() {

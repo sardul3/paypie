@@ -303,7 +303,6 @@ public class ExpenseGroupTest {
         assertEquals(expectedCredit.getAmount(), creator.getBalance());
         assertEquals(expectedSplit.getAmount().negate(), participant2.getBalance());
         assertEquals(expectedSplit.getAmount().negate(), participant3.getBalance());
-        assertEquals(BigDecimal.ZERO, creator.getBalance().subtract(expectedCredit.getAmount()));
     }
 
 }
