@@ -28,13 +28,22 @@ public class Money {
     }
 
     public Money add(Money other) {
-        validateAmount(amount);
+        if(other.isNegative()) {
+            throw new IllegalArgumentException("Cannot add negative money");
+        }
         return new Money(this.amount.add(other.amount));
     }
 
     public Money subtract(Money other) {
+        BigDecimal result = this.amount.subtract(other.amount);
+        return new Money(result);
+    }
+
+    public Money split(int ways) {
         validateAmount(amount);
-        return new Money(this.amount.subtract(other.amount));
+        if (ways <= 0) throw new IllegalArgumentException("Divisor must be greater than zero");
+        return new Money(this.amount.divide(BigDecimal.valueOf(ways),
+                MONEY_SCALE_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP));
     }
 
     public boolean isNegative() {

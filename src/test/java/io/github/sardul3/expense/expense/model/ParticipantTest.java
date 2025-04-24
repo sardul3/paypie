@@ -88,16 +88,6 @@ class ParticipantTest {
     }
 
     @Test
-    @DisplayName("Participant | participants cannot debit if it results in negative amount")
-    void participantShouldNotBeAbleToDebitAccountIfItLeadsToNegativeAmount() {
-        final String email = "user@comp.com";
-        final int money = 11;
-        Participant participant = Participant.withEmail(email);
-        Money creditMoney = Money.of(new BigDecimal(money));
-        assertThrows(IllegalStateException.class, () -> participant.debit(creditMoney));
-    }
-
-    @Test
     @DisplayName("Participant | participants cannot credit amount with value ZERO ($0)")
     void participantShouldNotBeAbleToCreditZeroAmount() {
         final String email = "user@comp.com";

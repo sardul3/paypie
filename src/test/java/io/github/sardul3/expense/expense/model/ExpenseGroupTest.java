@@ -263,18 +263,18 @@ public class ExpenseGroupTest {
         Participant anotherParticipant = Participant.withEmail("another@example.com");
         expenseGroup.addParticipant(anotherParticipant);
 
-        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, anotherParticipant);
+        ExpenseActivity activity = ExpenseActivity.from(activityDescription, activityAmount, paidBy);
 
         expenseGroup.activate();
         expenseGroup.addActivity(activity);
 
         assertThat(anotherParticipant)
                 .extracting(Participant::getBalance)
-                .isEqualTo(Money.of(new BigDecimal("5")));
+                .isEqualTo((new BigDecimal("-5.00")));
 
         assertThat(paidBy)
                 .extracting(Participant::getBalance)
-                .isEqualTo(Money.of(new BigDecimal("5")));
+                .isEqualTo(new BigDecimal("5.00"));
 
     }
 

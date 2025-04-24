@@ -43,9 +43,9 @@ public class Participant extends BaseEntity<ParticipantId> {
             throw new IllegalArgumentException("Cannot debit with zero or negative amount");
         }
         this.balance = this.balance.subtract(debitMoney);
-        if(balance.isNegative()) {
-            throw new IllegalStateException("After debit, the money cannot be negative");
-        }
+//        if(balance.isNegative()) {
+//            throw new IllegalStateException("After debit, the money cannot be negative");
+//        }
     }
 
     public String getEmail() {
@@ -59,6 +59,12 @@ public class Participant extends BaseEntity<ParticipantId> {
     public BigDecimal getBalance() {
         return balance.getAmount();
     }
+
+    public void setBalance(Money balance) {
+        this.balance = balance;
+    }
+
+
 
     @Override
     public String toString() {

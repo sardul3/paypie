@@ -4,6 +4,7 @@ import io.github.sardul3.expense.domain.common.annotation.AggregateRoot;
 import io.github.sardul3.expense.domain.common.base.BaseAggregateRoot;
 import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
+import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     public void addActivity(ExpenseActivity expenseActivity) {
         validateActivity(expenseActivity);
         this.activities.add(expenseActivity);
+        calculateGroupBalance(expenseActivity);
     }
 
     public List<ExpenseActivity> getActivities() {
@@ -92,4 +94,29 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
             throw new IllegalArgumentException("Activity " + expenseActivity + " already exists in the expense group");
         }
     }
+
+    private void calculateGroupBalance(ExpenseActivity activity) {
+        List<Participant> splitMembers = resolveSplitMembers(activity);
+        Money total = activity.getAmount();
+        int count = splitMembers.size();
+        Money share = total.split(count);
+
+        for (Participant member : splitMembers) {
+            if (!member.getParticipantId().equals(activity.getPaidBy().getParticipantId())) {
+                member.debit(share);
+            }
+        }
+        Participant payer = activity.getPaidBy();
+        payer.credit(total.subtract(share));
+    }
+
+    private List<Participant> resolveSplitMembers(ExpenseActivity activity) {
+        if (activity.getSplit().isSplitEvenlyForAllMembers()) {
+            return new ArrayList<>(participants);
+        }
+        return participants.stream()
+                .filter(p -> activity.getSplit().getSplitMembers().contains(p.getParticipantId()))
+                .toList();
+    }
+
 }

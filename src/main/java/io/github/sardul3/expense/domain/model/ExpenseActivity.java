@@ -54,6 +54,10 @@ public class ExpenseActivity {
         return paidBy;
     }
 
+    public Money getAmount() {
+        return amount;
+    }
+
     public ExpenseSplit getSplit() {
         return split;
     }
