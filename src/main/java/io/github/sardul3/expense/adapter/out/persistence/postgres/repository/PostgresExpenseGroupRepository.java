@@ -9,6 +9,8 @@ import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @SecondaryAdapter
 @Component
@@ -46,5 +48,16 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
                     return ExpenseGroup.from(GroupName.withName( entry.getName()), Participant.withEmail(entry.getCreatedBy()));
                 })
                 .toList();
+    }
+
+    @Override
+    public Optional<ExpenseGroup> findById(UUID id) {
+        return expenseGroupJpaRepository.findById(id)
+                .map(expenseGroupEntity ->
+                        ExpenseGroup.from(
+                                GroupName.withName(expenseGroupEntity.getName()),
+                                Participant.withEmail(expenseGroupEntity.getCreatedBy())
+                        )
+                );
     }
 }

@@ -74,11 +74,16 @@ public class ExpenseActivity {
         return amount;
     }
 
+
     public ExpenseSplit getSplit() {
         return split;
     }
 
     public void setSplit(ExpenseSplit split) {
         this.split = split;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

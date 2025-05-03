@@ -5,6 +5,8 @@ import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @OutputPort(
         description = "Abstracts the persistence of Expense Groups",
@@ -14,4 +16,5 @@ public interface ExpenseGroupRepository {
     boolean existsByName(GroupName groupName);
     ExpenseGroup save(ExpenseGroup expenseGroup);
     List<ExpenseGroup> findAll();
+    Optional<ExpenseGroup> findById(UUID id);
 }

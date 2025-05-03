@@ -2,12 +2,11 @@ package io.github.sardul3.expense.adapter.out.persistence.inmemory;
 
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
+import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryExpenseGroupRepository implements ExpenseGroupRepository {
 
@@ -28,5 +27,14 @@ public class InMemoryExpenseGroupRepository implements ExpenseGroupRepository {
     @Override
     public List<ExpenseGroup> findAll() {
         return store.values().stream().toList();
+    }
+
+    @Override
+    public Optional<ExpenseGroup> findById(UUID id) {
+        if(Optional.ofNullable(store.get(id)).isPresent()) {
+            return Optional.of(store.get(id));
+        } else {
+            return Optional.empty();
+        }
     }
 }

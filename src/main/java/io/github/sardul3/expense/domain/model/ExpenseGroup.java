@@ -10,6 +10,7 @@ import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @AggregateRoot(
         description = "Represents a group of participants collaborating on shared expenses",
@@ -121,4 +122,12 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
                 .toList();
     }
 
+    public Optional<Participant> getParticipantById(ParticipantId from) {
+        return this.participants
+                .stream()
+                .filter(p -> p.getParticipantId().equals(from))
+                .findFirst()
+                .map(Optional::of)
+                .orElse(Optional.empty());
+    }
 }
