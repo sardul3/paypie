@@ -55,6 +55,14 @@ tasks.named<JacocoReport>("jacocoTestReport") {
     }
 }
 
+sonar {
+    properties {
+        property("sonar.projectKey", "sardul3_paypie")
+        property("sonar.organization", "sardul3")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform {
         excludeTags("integration")
