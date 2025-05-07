@@ -1,5 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 plugins {
     java
@@ -7,6 +8,7 @@ plugins {
     id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
     id("info.solidsoft.pitest") version "1.15.0"
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 java {
@@ -45,7 +47,7 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
-tasks.jacocoTestReport {
+tasks.named<JacocoReport>("jacocoTestReport") {
     dependsOn(tasks.test) // Ensures test runs before report
     reports {
         xml.required.set(true)
