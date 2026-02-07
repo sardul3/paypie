@@ -31,10 +31,6 @@ public class InMemoryExpenseGroupRepository implements ExpenseGroupRepository {
 
     @Override
     public Optional<ExpenseGroup> findById(UUID id) {
-        if(Optional.ofNullable(store.get(id)).isPresent()) {
-            return Optional.of(store.get(id));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(store.get(ExpenseGroupId.from(id)));
     }
 }

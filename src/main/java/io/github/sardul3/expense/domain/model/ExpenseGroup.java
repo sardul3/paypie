@@ -8,10 +8,14 @@ import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Aggregate root: a group of participants sharing expenses. Manages participants, activation, and activities.
+ */
 @AggregateRoot(
         description = "Represents a group of participants collaborating on shared expenses",
         boundedContext = "expense-management"
@@ -26,10 +30,15 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     private List<Participant> participants;
     private List<ExpenseActivity> activities;
 
-    private ExpenseGroup(ExpenseGroupId expenseGroupId , GroupName groupName, Participant groupCreator) {
+    private ExpenseGroup(ExpenseGroupId expenseGroupId, GroupName groupName, Participant groupCreator) {
+        this(expenseGroupId, groupName, groupCreator, false);
+    }
+
+    private ExpenseGroup(ExpenseGroupId expenseGroupId, GroupName groupName, Participant groupCreator, boolean isActivated) {
         super(expenseGroupId);
         this.groupName = groupName;
         this.groupCreator = groupCreator;
+        this.isActivated = isActivated;
         this.participants = new ArrayList<>();
         this.participants.add(groupCreator);
         this.activities = new ArrayList<>();
@@ -41,6 +50,20 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
                 groupName,
                 creator
         );
+    }
+
+    /**
+     * Reconstitutes an ExpenseGroup from persistence. Restores identity and activation state.
+     * Participants and activities are not yet persisted; only creator is present.
+     *
+     * @param id          the persisted aggregate id
+     * @param groupName   the group name
+     * @param groupCreator the creator participant
+     * @param isActivated whether the group has been activated
+     * @return reconstituted aggregate
+     */
+    public static ExpenseGroup reconstitute(ExpenseGroupId id, GroupName groupName, Participant groupCreator, boolean isActivated) {
+        return new ExpenseGroup(id, groupName, groupCreator, isActivated);
     }
 
     public void addParticipant(Participant participant) {
@@ -64,11 +87,11 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     }
 
     public List<ExpenseActivity> getActivities() {
-        return activities;
+        return Collections.unmodifiableList(new ArrayList<>(activities));
     }
 
     public List<Participant> getParticipants() {
-        return participants;
+        return Collections.unmodifiableList(new ArrayList<>(participants));
     }
 
     public GroupName getGroupName() {

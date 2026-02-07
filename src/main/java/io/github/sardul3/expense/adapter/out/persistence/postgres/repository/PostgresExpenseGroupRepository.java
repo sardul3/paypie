@@ -5,6 +5,7 @@ import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.Expense
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
+import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
         ExpenseGroupEntity expenseGroupEntity =
                 ExpenseGroupEntity.builder()
                         .id(expenseGroup.getId().getId())
-                        .activated(false)
+                        .activated(expenseGroup.isActivated())
                         .name(expenseGroup.getGroupName().getName())
                         .createdBy(expenseGroup.getGroupCreator().getEmail())
                         .build();
@@ -44,20 +45,20 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
     public List<ExpenseGroup> findAll() {
         return expenseGroupJpaRepository.findAll()
                 .stream()
-                .map(entry -> {
-                    return ExpenseGroup.from(GroupName.withName( entry.getName()), Participant.withEmail(entry.getCreatedBy()));
-                })
+                .map(this::toDomain)
                 .toList();
     }
 
     @Override
     public Optional<ExpenseGroup> findById(UUID id) {
         return expenseGroupJpaRepository.findById(id)
-                .map(expenseGroupEntity ->
-                        ExpenseGroup.from(
-                                GroupName.withName(expenseGroupEntity.getName()),
-                                Participant.withEmail(expenseGroupEntity.getCreatedBy())
-                        )
-                );
+                .map(this::toDomain);
+    }
+
+    private ExpenseGroup toDomain(ExpenseGroupEntity entity) {
+        ExpenseGroupId id = ExpenseGroupId.from(entity.getId());
+        GroupName groupName = GroupName.withName(entity.getName());
+        Participant creator = Participant.withEmail(entity.getCreatedBy());
+        return ExpenseGroup.reconstitute(id, groupName, creator, entity.isActivated());
     }
 }

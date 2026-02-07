@@ -12,4 +12,14 @@ public class ExpenseGroupId extends BaseId<UUID> {
     public static ExpenseGroupId generate() {
         return new ExpenseGroupId(UUID.randomUUID());
     }
+
+    /**
+     * Reconstitutes an ExpenseGroupId from a persisted UUID.
+     *
+     * @param uuid the stored identifier
+     * @return a strongly typed ExpenseGroupId
+     */
+    public static ExpenseGroupId from(UUID uuid) {
+        return new ExpenseGroupId(uuid);
+    }
 }
