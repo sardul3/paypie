@@ -1,5 +1,6 @@
 package io.github.sardul3.expense.expense.persistence;
 
+import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.ExpenseActivityJpaRepository;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.ExpenseGroupJpaRepository;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.ParticipantJpaRepository;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.PostgresExpenseGroupRepository;
@@ -28,11 +29,14 @@ public class PostGresExpenseGroupRepositoryTest extends AbstractIntegrationTest 
     @Autowired
     private ParticipantJpaRepository participantJpaRepository;
 
+    @Autowired
+    private ExpenseActivityJpaRepository expenseActivityJpaRepository;
+
     private ExpenseGroupRepository repository;
 
     @BeforeEach
     void setUp() {
-        repository = new PostgresExpenseGroupRepository(jpaRepository, participantJpaRepository);
+        repository = new PostgresExpenseGroupRepository(jpaRepository, participantJpaRepository, expenseActivityJpaRepository);
     }
     @Test
     void shouldSaveAndRetrieveAnExpenseGroup() {

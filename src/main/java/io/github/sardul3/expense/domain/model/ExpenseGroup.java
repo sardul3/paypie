@@ -83,17 +83,35 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
                 .filter(p -> p.getEmail().equals(creatorEmail))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Creator email " + creatorEmail + " not in participants"));
-        return new ExpenseGroup(id, groupName, creator, isActivated, participants);
+        return new ExpenseGroup(id, groupName, creator, isActivated, participants, new ArrayList<>());
+    }
+
+    /**
+     * Reconstitutes an ExpenseGroup from persistence with full participant list and activities.
+     */
+    public static ExpenseGroup reconstitute(ExpenseGroupId id, GroupName groupName, String creatorEmail,
+                                           List<Participant> participants, boolean isActivated,
+                                           List<ExpenseActivity> activities) {
+        Participant creator = participants.stream()
+                .filter(p -> p.getEmail().equals(creatorEmail))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Creator email " + creatorEmail + " not in participants"));
+        return new ExpenseGroup(id, groupName, creator, isActivated, participants, activities);
     }
 
     private ExpenseGroup(ExpenseGroupId expenseGroupId, GroupName groupName, Participant groupCreator,
-                         boolean isActivated, List<Participant> participants) {
+                         boolean isActivated, List<Participant> participants, List<ExpenseActivity> activities) {
         super(expenseGroupId);
         this.groupName = groupName;
         this.groupCreator = groupCreator;
         this.isActivated = isActivated;
         this.participants = new ArrayList<>(participants);
-        this.activities = new ArrayList<>();
+        this.activities = new ArrayList<>(activities);
+    }
+
+    private ExpenseGroup(ExpenseGroupId expenseGroupId, GroupName groupName, Participant groupCreator,
+                         boolean isActivated, List<Participant> participants) {
+        this(expenseGroupId, groupName, groupCreator, isActivated, participants, new ArrayList<>());
     }
 
     public void addParticipant(Participant participant) {

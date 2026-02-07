@@ -7,6 +7,7 @@ import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.AddParticipantResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.dto.ExpenseGroupDetailResponse;
+import io.github.sardul3.expense.application.dto.ExpenseHistoryPageResponse;
 import io.github.sardul3.expense.application.dto.GroupBalanceResponse;
 import io.github.sardul3.expense.application.dto.SettleUpResponse;
 import org.springframework.http.ProblemDetail;
@@ -307,6 +308,24 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         var aliceBalance = balanceResponse.getBody().participants().stream().filter(p -> p.participantId().equals(aliceId)).findFirst().get().balance();
         assertThat(bobBalance).isEqualByComparingTo(java.math.BigDecimal.TEN);
         assertThat(aliceBalance).isEqualByComparingTo(java.math.BigDecimal.valueOf(-10));
+    }
+
+    @Test
+    void shouldGetExpenseHistoryPaginated() {
+        CreateExpenseGroupRequest createRequest = new CreateExpenseGroupRequest("history-group", "alice@example.com");
+        ResponseEntity<CreateExpenseGroupResponse> createResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", createRequest, CreateExpenseGroupResponse.class);
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        var groupId = createResponse.getBody().id();
+
+        ResponseEntity<ExpenseHistoryPageResponse> historyResponse = restTemplate.getForEntity(
+                "/api/v1/expense/groups/" + groupId + "/activities?page=0&size=20", ExpenseHistoryPageResponse.class);
+        assertThat(historyResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(historyResponse.getBody()).isNotNull();
+        assertThat(historyResponse.getBody().content()).isEmpty();
+        assertThat(historyResponse.getBody().totalElements()).isZero();
+        assertThat(historyResponse.getBody().size()).isEqualTo(20);
     }
 }
 

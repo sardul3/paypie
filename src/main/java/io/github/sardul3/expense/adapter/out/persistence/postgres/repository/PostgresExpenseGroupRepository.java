@@ -1,12 +1,15 @@
 package io.github.sardul3.expense.adapter.out.persistence.postgres.repository;
 
 import io.github.sardul3.expense.adapter.common.SecondaryAdapter;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.ExpenseActivityEntity;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.ExpenseGroupEntity;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.entity.ParticipantEntity;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.model.ExpenseActivity;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
+import io.github.sardul3.expense.domain.valueobject.ExpenseSplit;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
@@ -23,11 +26,14 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
 
     private final ExpenseGroupJpaRepository expenseGroupJpaRepository;
     private final ParticipantJpaRepository participantJpaRepository;
+    private final ExpenseActivityJpaRepository expenseActivityJpaRepository;
 
     public PostgresExpenseGroupRepository(ExpenseGroupJpaRepository expenseGroupJpaRepository,
-                                          ParticipantJpaRepository participantJpaRepository) {
+                                          ParticipantJpaRepository participantJpaRepository,
+                                          ExpenseActivityJpaRepository expenseActivityJpaRepository) {
         this.expenseGroupJpaRepository = expenseGroupJpaRepository;
         this.participantJpaRepository = participantJpaRepository;
+        this.expenseActivityJpaRepository = expenseActivityJpaRepository;
     }
 
     @Override
@@ -56,6 +62,18 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
                     p.getBalance()
             );
             participantJpaRepository.save(pe);
+        }
+        expenseActivityJpaRepository.deleteByGroupId(expenseGroup.getId().getId());
+        for (ExpenseActivity a : expenseGroup.getActivities()) {
+            ExpenseActivityEntity ae = new ExpenseActivityEntity(
+                    UUID.randomUUID(),
+                    expenseGroup.getId().getId(),
+                    a.getDescription(),
+                    a.getAmount().getAmount(),
+                    a.getPaidBy().getParticipantId().getId(),
+                    a.getSplit().isSplitEvenlyForAllMembers()
+            );
+            expenseActivityJpaRepository.save(ae);
         }
         return expenseGroup;
     }
@@ -88,6 +106,23 @@ public class PostgresExpenseGroupRepository implements ExpenseGroupRepository {
                         pe.getEmail(),
                         Money.fromBalance(pe.getBalanceAmount())))
                 .toList();
-        return ExpenseGroup.reconstitute(id, groupName, entity.getCreatedBy(), participants, entity.isActivated());
+        List<ExpenseActivityEntity> activityEntities = expenseActivityJpaRepository.findByGroupIdOrderByAmountDesc(entity.getId());
+        List<ExpenseActivity> activities = activityEntities.stream()
+                .map(ae -> toActivity(ae, participants))
+                .toList();
+        return ExpenseGroup.reconstitute(id, groupName, entity.getCreatedBy(), participants, entity.isActivated(), activities);
+    }
+
+    private ExpenseActivity toActivity(ExpenseActivityEntity ae, List<Participant> participants) {
+        Participant paidBy = participants.stream()
+                .filter(p -> p.getParticipantId().getId().equals(ae.getPaidByParticipantId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Activity references unknown participant: " + ae.getPaidByParticipantId()));
+        return ExpenseActivity.from(
+                ae.getDescription(),
+                Money.of(ae.getAmount()),
+                paidBy,
+                new ExpenseSplit(ae.isSplitEvenly())
+        );
     }
 }
