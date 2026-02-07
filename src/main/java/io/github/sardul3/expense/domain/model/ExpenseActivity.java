@@ -18,28 +18,25 @@ public class ExpenseActivity {
     private final String description;
     private final Money amount;
     private final Participant paidBy;
+    private final ExpenseSplit split;
 
-    private ExpenseSplit split;
-
-    private ExpenseActivity(String description, Money amount, Participant paidBy) {
+    private ExpenseActivity(String description, Money amount, Participant paidBy, ExpenseSplit split) {
         this.description = description;
         this.amount = amount;
         this.paidBy = paidBy;
-        this.split = new ExpenseSplit(true);
-    }
-
-    private ExpenseActivity(String description, Money amount, Participant paidBy, List<ParticipantId> splitMembers) {
-        this.description = description;
-        this.amount = amount;
-        this.paidBy = paidBy;
-        this.split = new ExpenseSplit(false);
-        this.split.setSplitMembers(splitMembers);
+        this.split = split != null ? split : new ExpenseSplit(true);
     }
 
     public static ExpenseActivity from(String description, Money amount, Participant paidBy) {
         validateExpenseAmount(amount);
         validateExpenseDescription(description);
-        return new ExpenseActivity(description, amount, paidBy);
+        return new ExpenseActivity(description, amount, paidBy, new ExpenseSplit(true));
+    }
+
+    public static ExpenseActivity from(String description, Money amount, Participant paidBy, ExpenseSplit split) {
+        validateExpenseAmount(amount);
+        validateExpenseDescription(description);
+        return new ExpenseActivity(description, amount, paidBy, split);
     }
 
     private static void validateExpenseAmount(Money amount) {
@@ -63,7 +60,7 @@ public class ExpenseActivity {
     public static ExpenseActivity from(String description, Money amount, Participant paidBy, List<ParticipantId> splitMembers) {
         validateExpenseAmount(amount);
         validateExpenseDescription(description);
-        return new ExpenseActivity(description, amount, paidBy, splitMembers);
+        return new ExpenseActivity(description, amount, paidBy, ExpenseSplit.customSplit(splitMembers));
     }
 
     public Participant getPaidBy() {
@@ -77,10 +74,6 @@ public class ExpenseActivity {
 
     public ExpenseSplit getSplit() {
         return split;
-    }
-
-    public void setSplit(ExpenseSplit split) {
-        this.split = split;
     }
 
     public String getDescription() {

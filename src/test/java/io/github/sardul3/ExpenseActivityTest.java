@@ -48,11 +48,8 @@ class ExpenseActivityTest {
     void expenseActivityShouldEnableSettingDifferentSplitStrategy() {
         Participant paidBy = Participant.withEmail("user@group1.com");
         Participant groupMember = Participant.withEmail("user1@group1.com");
-        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy);
-
-        ExpenseSplit split = new ExpenseSplit(false);
-        split.setSplitMembers(List.of(paidBy.getParticipantId(), groupMember.getParticipantId()));
-        activity.setSplit(split);
+        ExpenseSplit split = ExpenseSplit.customSplit(List.of(paidBy.getParticipantId(), groupMember.getParticipantId()));
+        ExpenseActivity activity = ExpenseActivity.from("grocery", Money.of(BigDecimal.TEN), paidBy, split);
 
         assertThat(activity)
                 .extracting(ExpenseActivity::getSplit)
