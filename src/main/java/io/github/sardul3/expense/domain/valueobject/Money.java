@@ -3,11 +3,14 @@ package io.github.sardul3.expense.domain.valueobject;
 import io.github.sardul3.expense.domain.common.annotation.ValueObject;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
+/**
+ * Value object: immutable monetary amount with scale 2 and HALF_UP rounding.
+ */
 @ValueObject(description = "Represents an amount in currency",
         boundedContext = "expense-management")
-
 public class Money {
     private static final int MONEY_SCALE_DECIMAL_PLACES = 2;
 
@@ -15,7 +18,7 @@ public class Money {
 
     private Money(BigDecimal amount) {
         this.amount = Objects.requireNonNull(amount, "Amount cannot be null")
-                .setScale(MONEY_SCALE_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP);
+                .setScale(MONEY_SCALE_DECIMAL_PLACES, RoundingMode.HALF_UP);
     }
 
     public static Money of(BigDecimal amount) {
@@ -43,7 +46,7 @@ public class Money {
         validateAmount(amount);
         if (ways <= 0) throw new IllegalArgumentException("Divisor must be greater than zero");
         return new Money(this.amount.divide(BigDecimal.valueOf(ways),
-                MONEY_SCALE_DECIMAL_PLACES, BigDecimal.ROUND_HALF_UP));
+                MONEY_SCALE_DECIMAL_PLACES, RoundingMode.HALF_UP));
     }
 
     public boolean isNegative() {
