@@ -43,7 +43,7 @@ PayPie follows a clean architecture approach with clear separation of concerns:
 
 ### Prerequisites
 
-- Java 17 or higher
+- Java 21 or higher
 - Docker and Docker Compose
 - Gradle
 
@@ -125,15 +125,15 @@ docker-compose up -d postgres dbviz
 
 2. The application will be available at `http://localhost:8080`
 
-## 📚 API Documentation
+## 📚 API
 
-The API documentation is available at `/swagger-ui.html` when the application is running.
+Base path: `/api/v1/expense`. Configuration: `app.api.basePath`, `app.api.version` (see `application.yml`).
 
 ### Key Endpoints
 
-- `POST /api/v1/expense-groups` - Create a new expense group
-- `GET /api/v1/expense-groups/{id}` - Get expense group details
-- `POST /api/v1/expense-groups/{id}/participants` - Add a participant to a group
+- `POST /api/v1/expense/groups` - Create a new expense group
+- `GET /api/v1/expense/groups` - List all expense groups
+- `POST /api/v1/expense/groups/{groupId}/activities` - Create an expense activity in a group
 
 ## 🛠️ Development
 
