@@ -1,7 +1,9 @@
 package io.github.sardul3.expense.expense.web;
 
+import io.github.sardul3.expense.adapter.in.web.dto.AddParticipantRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
+import io.github.sardul3.expense.application.dto.AddParticipantResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.dto.ExpenseGroupDetailResponse;
 import org.springframework.http.ProblemDetail;
@@ -191,6 +193,60 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().name()).isEqualTo("neat-group");
+    }
+
+    @Test
+    void shouldAddParticipantAndPersistThenReturnInGetGroup() {
+        CreateExpenseGroupRequest createRequest = new CreateExpenseGroupRequest("add-participant-group", "owner@example.com");
+        ResponseEntity<CreateExpenseGroupResponse> createResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", createRequest, CreateExpenseGroupResponse.class);
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        var groupId = createResponse.getBody().id();
+
+        AddParticipantRequest addRequest = new AddParticipantRequest("member@example.com");
+        ResponseEntity<AddParticipantResponse> addResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups/" + groupId + "/participants", addRequest, AddParticipantResponse.class);
+        assertThat(addResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(addResponse.getBody()).isNotNull();
+        assertThat(addResponse.getBody().email()).isEqualTo("member@example.com");
+        assertThat(addResponse.getBody().participantId()).isNotNull();
+
+        ResponseEntity<ExpenseGroupDetailResponse> getResponse = restTemplate.getForEntity(
+                "/api/v1/expense/groups/" + groupId, ExpenseGroupDetailResponse.class);
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(getResponse.getBody()).isNotNull();
+        assertThat(getResponse.getBody().participants()).hasSize(2);
+        assertThat(getResponse.getBody().participants().stream().map(p -> p.email()).toList())
+                .containsExactlyInAnyOrder("owner@example.com", "member@example.com");
+    }
+
+    @Test
+    void shouldReturn404WhenAddingParticipantToNonExistentGroup() {
+        var groupId = java.util.UUID.randomUUID();
+        AddParticipantRequest addRequest = new AddParticipantRequest("someone@example.com");
+        ResponseEntity<ProblemDetail> response = restTemplate.postForEntity(
+                "/api/v1/expense/groups/" + groupId + "/participants", addRequest, ProblemDetail.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    void shouldReturn409WhenAddingDuplicateParticipant() {
+        CreateExpenseGroupRequest createRequest = new CreateExpenseGroupRequest("dup-participant-group", "dup@example.com");
+        ResponseEntity<CreateExpenseGroupResponse> createResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", createRequest, CreateExpenseGroupResponse.class);
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        var groupId = createResponse.getBody().id();
+
+        AddParticipantRequest addRequest = new AddParticipantRequest("dup@example.com");
+        ResponseEntity<ProblemDetail> conflictResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups/" + groupId + "/participants", addRequest, ProblemDetail.class);
+        assertThat(conflictResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(conflictResponse.getBody()).isNotNull();
+        assertThat(conflictResponse.getBody().getStatus()).isEqualTo(409);
     }
 }
 

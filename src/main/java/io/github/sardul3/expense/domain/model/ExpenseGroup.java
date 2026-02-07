@@ -66,6 +66,35 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         return new ExpenseGroup(id, groupName, groupCreator, isActivated);
     }
 
+    /**
+     * Reconstitutes an ExpenseGroup from persistence with full participant list.
+     *
+     * @param id            the persisted aggregate id
+     * @param groupName     the group name
+     * @param creatorEmail  email of the group creator (must match one participant)
+     * @param participants  all participants with their balances
+     * @param isActivated   whether the group has been activated
+     * @return reconstituted aggregate
+     */
+    public static ExpenseGroup reconstitute(ExpenseGroupId id, GroupName groupName, String creatorEmail,
+                                           List<Participant> participants, boolean isActivated) {
+        Participant creator = participants.stream()
+                .filter(p -> p.getEmail().equals(creatorEmail))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Creator email " + creatorEmail + " not in participants"));
+        return new ExpenseGroup(id, groupName, creator, isActivated, participants);
+    }
+
+    private ExpenseGroup(ExpenseGroupId expenseGroupId, GroupName groupName, Participant groupCreator,
+                         boolean isActivated, List<Participant> participants) {
+        super(expenseGroupId);
+        this.groupName = groupName;
+        this.groupCreator = groupCreator;
+        this.isActivated = isActivated;
+        this.participants = new ArrayList<>(participants);
+        this.activities = new ArrayList<>();
+    }
+
     public void addParticipant(Participant participant) {
         if(this.participants.contains(participant)) {
             throw new IllegalArgumentException("Participant " + participant + " already exists in the expense group");

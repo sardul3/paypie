@@ -1,6 +1,7 @@
 package io.github.sardul3.expense.expense.persistence;
 
 import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.ExpenseGroupJpaRepository;
+import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.ParticipantJpaRepository;
 import io.github.sardul3.expense.adapter.out.persistence.postgres.repository.PostgresExpenseGroupRepository;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -25,11 +25,14 @@ public class PostGresExpenseGroupRepositoryTest extends AbstractIntegrationTest 
     @Autowired
     private ExpenseGroupJpaRepository jpaRepository;
 
+    @Autowired
+    private ParticipantJpaRepository participantJpaRepository;
+
     private ExpenseGroupRepository repository;
 
     @BeforeEach
     void setUp() {
-        repository = new PostgresExpenseGroupRepository(jpaRepository);
+        repository = new PostgresExpenseGroupRepository(jpaRepository, participantJpaRepository);
     }
     @Test
     void shouldSaveAndRetrieveAnExpenseGroup() {

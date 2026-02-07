@@ -30,6 +30,20 @@ public class Money {
         return new Money(BigDecimal.ZERO);
     }
 
+    /**
+     * Creates Money from a balance amount (e.g. when reconstituting from persistence).
+     * Allows negative values for balance representation.
+     *
+     * @param amount balance amount (may be negative)
+     * @return Money with given amount
+     */
+    public static Money fromBalance(BigDecimal amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
+        return new Money(amount.setScale(MONEY_SCALE_DECIMAL_PLACES, RoundingMode.HALF_UP));
+    }
+
     public Money add(Money other) {
         if(other.isNegative()) {
             throw new IllegalArgumentException("Cannot add negative money");

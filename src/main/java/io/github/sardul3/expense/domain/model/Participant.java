@@ -31,6 +31,18 @@ public class Participant extends BaseEntity<ParticipantId> {
                 Money.withZeroBalance());
     }
 
+    /**
+     * Reconstitutes a participant from persistence.
+     *
+     * @param id     persisted participant id
+     * @param email  participant email
+     * @param balance current balance
+     * @return reconstituted participant
+     */
+    public static Participant reconstitute(ParticipantId id, String email, Money balance) {
+        return new Participant(id, ParticipantEmail.of(email), balance);
+    }
+
     public void credit(Money creditMoney) {
         if (creditMoney.isNotPositive()) {
             throw new IllegalArgumentException("Cannot credit with zero or negative amount");
