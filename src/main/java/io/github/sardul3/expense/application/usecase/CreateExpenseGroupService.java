@@ -10,6 +10,9 @@ import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 
+/**
+ * Use case: creates a new expense group. Ensures name uniqueness and persists via the repository.
+ */
 @UseCase(description = "Creates a new expense group in the system", inputPort = CreateExpenseGroupUseCase.class)
 public class CreateExpenseGroupService implements CreateExpenseGroupUseCase {
 

@@ -9,6 +9,9 @@ import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Use case: fetches all expense groups from the repository and maps to response DTOs.
+ */
 @UseCase(description = "Fetches all the expense groups in the system", inputPort = RetrieveAllExpenseGroupsUseCase.class)
 public class RetrieveAllExpenseGroupService implements RetrieveAllExpenseGroupsUseCase {
 
