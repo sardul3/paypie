@@ -1,8 +1,9 @@
 package io.github.sardul3.expense.expense.web;
 
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
-import io.github.sardul3.expense.adapter.in.web.dto.ErrorResponse;
+import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
+import org.springframework.http.ProblemDetail;
 import io.github.sardul3.integration.AbstractIntegrationTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -46,13 +47,13 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // Second creation with same name: should fail with conflict
-        ResponseEntity<ErrorResponse> conflictResponse = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ErrorResponse.class
+        ResponseEntity<ProblemDetail> conflictResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", request, ProblemDetail.class
         );
 
         assertThat(conflictResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(conflictResponse.getBody()).isNotNull();
-        assertThat(conflictResponse.getBody().status()).isEqualTo(409);
+        assertThat(conflictResponse.getBody().getStatus()).isEqualTo(409);
     }
 
     @Test
@@ -73,8 +74,8 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
     void shouldReturn400BadRequestWithInvalidNameMessage() {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest("", "user@demo.com");
 
-        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ErrorResponse.class
+        ResponseEntity<ValidationErrorResponse> response = restTemplate.postForEntity(
+                "/api/v1/expense/groups", request, ValidationErrorResponse.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -86,8 +87,8 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
     void shouldReturn400BadRequestWithInvalidEmail() {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest("demo", "userdemo.com");
 
-        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ErrorResponse.class
+        ResponseEntity<ValidationErrorResponse> response = restTemplate.postForEntity(
+                "/api/v1/expense/groups", request, ValidationErrorResponse.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -99,8 +100,8 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
     void shouldRejectMalformedEmail() {
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest("group2", "wrong-format");
 
-        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ErrorResponse.class);
+        ResponseEntity<ValidationErrorResponse> response = restTemplate.postForEntity(
+                "/api/v1/expense/groups", request, ValidationErrorResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
@@ -112,12 +113,13 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         String longName = "x".repeat(60);
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(longName, "user@demo.com");
 
-        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ErrorResponse.class);
+        ResponseEntity<ProblemDetail> response = restTemplate.postForEntity(
+                "/api/v1/expense/groups", request, ProblemDetail.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().error()).contains("Illegal Argument");
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getDetail()).contains("longer");
     }
 
     @Test
@@ -139,8 +141,8 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
 
         HttpEntity<String> invalidEntity = new HttpEntity<>("invalid body", headers);
 
-        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups", invalidEntity, ErrorResponse.class);
+        ResponseEntity<ProblemDetail> response = restTemplate.postForEntity(
+                "/api/v1/expense/groups", invalidEntity, ProblemDetail.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }

@@ -3,7 +3,6 @@ package io.github.sardul3.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sardul3.expense.PayPieApplication;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
-import io.github.sardul3.expense.adapter.in.web.dto.ErrorResponse;
 import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import org.junit.jupiter.api.AfterAll;
@@ -69,10 +68,10 @@ public class SampleTestContainer extends AbstractIntegrationTest {
                 CreateExpenseGroupRequest.class
         );
 
-        ResponseEntity<ErrorResponse> response = performPost(
+        ResponseEntity<ValidationErrorResponse> response = performPost(
                 "/api/v1/expense/groups",
                 request,
-                ErrorResponse.class
+                ValidationErrorResponse.class
         );
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();

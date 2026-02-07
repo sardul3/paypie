@@ -1,7 +1,10 @@
 package io.github.sardul3.expense.application.exception;
 
-public class ParticipantNotFoundInGroupException extends RuntimeException {
+/**
+ * Thrown when a participant referenced in an operation is not a member of the expense group.
+ */
+public class ParticipantNotFoundInGroupException extends BaseAppException {
     public ParticipantNotFoundInGroupException(String message) {
-        super(message);
+        super(ErrorCode.NOT_FOUND, message);
     }
 }

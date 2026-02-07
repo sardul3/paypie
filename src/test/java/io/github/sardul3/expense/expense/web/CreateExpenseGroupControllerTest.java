@@ -152,9 +152,9 @@ class CreateExpenseGroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Group already exists"))
+                .andExpect(jsonPath("$.detail").value("Group already exists"))
                 .andExpect(jsonPath("$.status").value(409))
-                .andExpect(jsonPath("$.error").value("Conflict"));
+                .andExpect(jsonPath("$.title").value("CONFLICT"));
     }
 
     @Test
@@ -171,9 +171,9 @@ class CreateExpenseGroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Invalid group parameters"))
+                .andExpect(jsonPath("$.detail").value("Invalid group parameters"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.error").value("Illegal Argument"));
+                .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
     @Test
@@ -190,9 +190,9 @@ class CreateExpenseGroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Group cannot be activated"))
+                .andExpect(jsonPath("$.detail").value("Group cannot be activated"))
                 .andExpect(jsonPath("$.status").value(409))
-                .andExpect(jsonPath("$.error").value("Illegal State"));
+                .andExpect(jsonPath("$.title").value("Conflict"));
     }
 
     @Test
