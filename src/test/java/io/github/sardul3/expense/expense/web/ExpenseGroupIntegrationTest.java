@@ -3,6 +3,7 @@ package io.github.sardul3.expense.expense.web;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
+import io.github.sardul3.expense.application.dto.ExpenseGroupDetailResponse;
 import org.springframework.http.ProblemDetail;
 import io.github.sardul3.integration.AbstractIntegrationTest;
 import org.junit.jupiter.api.Tag;
@@ -34,6 +35,39 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().name()).isEqualTo("success-demo");
+    }
+
+    @Test
+    void shouldGetExpenseGroupByIdAfterCreate() {
+        CreateExpenseGroupRequest request = new CreateExpenseGroupRequest("get-by-id-group", "creator@example.com");
+        ResponseEntity<CreateExpenseGroupResponse> createResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", request, CreateExpenseGroupResponse.class
+        );
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        var groupId = createResponse.getBody().id();
+
+        ResponseEntity<ExpenseGroupDetailResponse> getResponse = restTemplate.getForEntity(
+                "/api/v1/expense/groups/" + groupId, ExpenseGroupDetailResponse.class
+        );
+
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(getResponse.getBody()).isNotNull();
+        assertThat(getResponse.getBody().id()).isEqualTo(groupId);
+        assertThat(getResponse.getBody().name()).isEqualTo("get-by-id-group");
+        assertThat(getResponse.getBody().createdBy()).isEqualTo("creator@example.com");
+        assertThat(getResponse.getBody().participants()).hasSize(1);
+        assertThat(getResponse.getBody().participants().get(0).email()).isEqualTo("creator@example.com");
+    }
+
+    @Test
+    void shouldReturn404WhenGettingNonExistentGroup() {
+        ResponseEntity<ProblemDetail> response = restTemplate.getForEntity(
+                "/api/v1/expense/groups/00000000-0000-0000-0000-000000000000", ProblemDetail.class
+        );
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(404);
     }
 
     @Test
