@@ -2,11 +2,13 @@ package io.github.sardul3.expense.expense.web;
 
 import io.github.sardul3.expense.adapter.in.web.dto.AddParticipantRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
+import io.github.sardul3.expense.adapter.in.web.dto.SettleUpRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.AddParticipantResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.dto.ExpenseGroupDetailResponse;
 import io.github.sardul3.expense.application.dto.GroupBalanceResponse;
+import io.github.sardul3.expense.application.dto.SettleUpResponse;
 import org.springframework.http.ProblemDetail;
 import io.github.sardul3.integration.AbstractIntegrationTest;
 import org.junit.jupiter.api.Tag;
@@ -270,6 +272,41 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(balanceResponse.getBody()).isNotNull();
         assertThat(balanceResponse.getBody().groupId()).isEqualTo(groupId);
         assertThat(balanceResponse.getBody().participants()).hasSize(2);
+    }
+
+    @Test
+    void shouldSettleUpAndPersistBalances() {
+        CreateExpenseGroupRequest createRequest = new CreateExpenseGroupRequest("settle-group", "alice@example.com");
+        ResponseEntity<CreateExpenseGroupResponse> createResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", createRequest, CreateExpenseGroupResponse.class);
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        var groupId = createResponse.getBody().id();
+
+        restTemplate.postForEntity(
+                "/api/v1/expense/groups/" + groupId + "/participants",
+                new AddParticipantRequest("bob@example.com"),
+                AddParticipantResponse.class);
+        var groupDetail = restTemplate.getForEntity("/api/v1/expense/groups/" + groupId, ExpenseGroupDetailResponse.class).getBody();
+        assertThat(groupDetail).isNotNull();
+        var aliceId = groupDetail.participants().stream().filter(p -> "alice@example.com".equals(p.email())).findFirst().get().participantId();
+        var bobId = groupDetail.participants().stream().filter(p -> "bob@example.com".equals(p.email())).findFirst().get().participantId();
+
+        SettleUpRequest settleRequest = new SettleUpRequest(bobId, aliceId, java.math.BigDecimal.TEN);
+        ResponseEntity<SettleUpResponse> settleResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups/" + groupId + "/settle", settleRequest, SettleUpResponse.class);
+        assertThat(settleResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(settleResponse.getBody()).isNotNull();
+        assertThat(settleResponse.getBody().groupId()).isEqualTo(groupId);
+
+        ResponseEntity<GroupBalanceResponse> balanceResponse = restTemplate.getForEntity(
+                "/api/v1/expense/groups/" + groupId + "/balance", GroupBalanceResponse.class);
+        assertThat(balanceResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(balanceResponse.getBody()).isNotNull();
+        var bobBalance = balanceResponse.getBody().participants().stream().filter(p -> p.participantId().equals(bobId)).findFirst().get().balance();
+        var aliceBalance = balanceResponse.getBody().participants().stream().filter(p -> p.participantId().equals(aliceId)).findFirst().get().balance();
+        assertThat(bobBalance).isEqualByComparingTo(java.math.BigDecimal.TEN);
+        assertThat(aliceBalance).isEqualByComparingTo(java.math.BigDecimal.valueOf(-10));
     }
 }
 

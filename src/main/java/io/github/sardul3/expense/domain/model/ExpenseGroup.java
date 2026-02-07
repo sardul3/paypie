@@ -6,6 +6,7 @@ import io.github.sardul3.expense.domain.valueobject.ExpenseGroupId;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
+import io.github.sardul3.expense.domain.valueobject.Settlement;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,6 +103,21 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
         this.participants.add(participant);
     }
 
+    /**
+     * Records a settlement: payer (from) credits by amount, receiver (to) debits by amount.
+     *
+     * @param settlement settlement between two participants
+     * @throws IllegalArgumentException if either participant is not in the group
+     */
+    public void settle(Settlement settlement) {
+        Participant from = getParticipantById(settlement.getFromParticipantId())
+                .orElseThrow(() -> new IllegalArgumentException("Payer participant not in group: " + settlement.getFromParticipantId()));
+        Participant to = getParticipantById(settlement.getToParticipantId())
+                .orElseThrow(() -> new IllegalArgumentException("Receiver participant not in group: " + settlement.getToParticipantId()));
+        from.credit(settlement.getAmount());
+        to.debit(settlement.getAmount());
+    }
+
     public void activate() {
         if(this.participants.size() < MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION) {
             throw new IllegalStateException("Group cannot be activated as it has less than " + MIN_MEMBERS_NEEDED_BEFORE_ACTIVATION + " members");
@@ -175,11 +191,8 @@ public class ExpenseGroup extends BaseAggregateRoot<ExpenseGroupId> {
     }
 
     public Optional<Participant> getParticipantById(ParticipantId from) {
-        return this.participants
-                .stream()
+        return this.participants.stream()
                 .filter(p -> p.getParticipantId().equals(from))
-                .findFirst()
-                .map(Optional::of)
-                .orElse(Optional.empty());
+                .findFirst();
     }
 }

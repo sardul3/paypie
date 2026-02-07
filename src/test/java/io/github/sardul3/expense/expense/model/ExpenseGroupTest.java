@@ -6,6 +6,7 @@ import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
+import io.github.sardul3.expense.domain.valueobject.Settlement;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -329,6 +330,40 @@ public class ExpenseGroupTest {
         assertEquals(expectedCredit.getAmount(), creator.getBalance());
         assertEquals(expectedSplit.getAmount().negate(), participant2.getBalance());
         assertEquals(expectedExcludedCredit.getAmount(), participant3.getBalance());
+    }
+
+    @Test
+    @DisplayName("Expense Group | should update balances when settle is called")
+    void expenseGroupShouldUpdateBalancesWhenSettleIsCalled() {
+        Participant alice = Participant.withEmail("alice@example.com");
+        Participant bob = Participant.withEmail("bob@example.com");
+        ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+        group.addParticipant(bob);
+        group.activate();
+        // Alice pays 100, split with Bob: Alice +50, Bob -50
+        group.addActivity(ExpenseActivity.from("Dinner", Money.of(BigDecimal.valueOf(100)), alice,
+                List.of(alice.getParticipantId(), bob.getParticipantId())));
+        assertThat(alice.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(50));
+        assertThat(bob.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(-50));
+
+        Settlement settlement = Settlement.of(bob.getParticipantId(), alice.getParticipantId(), Money.of(BigDecimal.valueOf(50)));
+        group.settle(settlement);
+
+        assertThat(bob.getBalance()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(alice.getBalance()).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    @DisplayName("Expense Group | should throw when settle participant not in group")
+    void expenseGroupSettleShouldThrowWhenParticipantNotInGroup() {
+        Participant alice = Participant.withEmail("alice@example.com");
+        ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+        ParticipantId outsider = ParticipantId.generate();
+        Settlement settlement = Settlement.of(outsider, alice.getParticipantId(), Money.of(BigDecimal.ONE));
+
+        assertThatThrownBy(() -> group.settle(settlement))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("not in group");
     }
 
 }
