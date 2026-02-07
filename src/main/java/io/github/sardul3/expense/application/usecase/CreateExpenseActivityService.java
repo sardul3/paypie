@@ -13,7 +13,6 @@ import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @UseCase(description = "Creates a new expense activity within the group", inputPort = CreateExpenseActivityUseCase.class)
