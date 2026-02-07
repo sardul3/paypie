@@ -6,6 +6,7 @@ import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.AddParticipantResponse;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.dto.ExpenseGroupDetailResponse;
+import io.github.sardul3.expense.application.dto.GroupBalanceResponse;
 import org.springframework.http.ProblemDetail;
 import io.github.sardul3.integration.AbstractIntegrationTest;
 import org.junit.jupiter.api.Tag;
@@ -247,6 +248,28 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(conflictResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(conflictResponse.getBody()).isNotNull();
         assertThat(conflictResponse.getBody().getStatus()).isEqualTo(409);
+    }
+
+    @Test
+    void shouldGetGroupBalanceAfterCreateAndAddParticipant() {
+        CreateExpenseGroupRequest createRequest = new CreateExpenseGroupRequest("balance-group", "payer@example.com");
+        ResponseEntity<CreateExpenseGroupResponse> createResponse = restTemplate.postForEntity(
+                "/api/v1/expense/groups", createRequest, CreateExpenseGroupResponse.class);
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createResponse.getBody()).isNotNull();
+        var groupId = createResponse.getBody().id();
+
+        restTemplate.postForEntity(
+                "/api/v1/expense/groups/" + groupId + "/participants",
+                new AddParticipantRequest("member@example.com"),
+                AddParticipantResponse.class);
+
+        ResponseEntity<GroupBalanceResponse> balanceResponse = restTemplate.getForEntity(
+                "/api/v1/expense/groups/" + groupId + "/balance", GroupBalanceResponse.class);
+        assertThat(balanceResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(balanceResponse.getBody()).isNotNull();
+        assertThat(balanceResponse.getBody().groupId()).isEqualTo(groupId);
+        assertThat(balanceResponse.getBody().participants()).hasSize(2);
     }
 }
 
