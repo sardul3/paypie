@@ -2,12 +2,8 @@ package io.github.sardul3.expense.adapter.in.web.controller;
 
 import io.github.sardul3.expense.adapter.common.PrimaryAdapter;
 import io.github.sardul3.expense.adapter.in.web.dto.AllExpenseGroupsResponse;
-import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
-import io.github.sardul3.expense.application.dto.CreateExpenseGroupCommand;
-import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.dto.RetrieveExpenseGroupsResponse;
 import io.github.sardul3.expense.application.port.in.RetrieveAllExpenseGroupsUseCase;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,14 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @PrimaryAdapter
 @RestController
 @RequestMapping("/api/v1/expense")
 public class RetrieveAllExpenseGroupsController {
-    private final static Logger log = LoggerFactory.getLogger(CreateExpenseGroupController.class);
+    private static final Logger log = LoggerFactory.getLogger(RetrieveAllExpenseGroupsController.class);
 
     private final RetrieveAllExpenseGroupsUseCase retrieveAllExpenseGroupsUseCase;
 

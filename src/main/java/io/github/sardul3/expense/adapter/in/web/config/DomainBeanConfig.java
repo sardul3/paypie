@@ -1,8 +1,10 @@
 package io.github.sardul3.expense.adapter.in.web.config;
 
+import io.github.sardul3.expense.application.port.in.CreateExpenseActivityUseCase;
 import io.github.sardul3.expense.application.port.in.CreateExpenseGroupUseCase;
 import io.github.sardul3.expense.application.port.in.RetrieveAllExpenseGroupsUseCase;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.application.usecase.CreateExpenseActivityService;
 import io.github.sardul3.expense.application.usecase.CreateExpenseGroupService;
 import io.github.sardul3.expense.application.usecase.RetrieveAllExpenseGroupService;
 import org.springframework.context.annotation.Bean;
@@ -18,5 +20,10 @@ public class DomainBeanConfig {
     @Bean
     public RetrieveAllExpenseGroupsUseCase retrieveAllExpenseGroupsUseCase(ExpenseGroupRepository expenseGroupRepository) {
         return new RetrieveAllExpenseGroupService(expenseGroupRepository);
+    }
+
+    @Bean
+    public CreateExpenseActivityUseCase createExpenseActivityUseCase(ExpenseGroupRepository expenseGroupRepository) {
+        return new CreateExpenseActivityService(expenseGroupRepository);
     }
 }
