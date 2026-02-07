@@ -81,7 +81,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     imageName.set("sagarpoudel14/paypie-app")
     environment.set(
         mapOf(
-            "BP_JVM_VERSION" to "17",
+            "BP_JVM_VERSION" to "21",
             "BP_NATIVE_IMAGE" to "false"
         )
     )
@@ -91,7 +91,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
 pitest {
     junit5PluginVersion.set("1.2.1")
     targetClasses.set(listOf("io.github.sardul3.expense.domain.model.*"))
-    targetTests.set(listOf("io.github.sardul3.expense.expense.model.*"))
+    targetTests.set(listOf("io.github.sardul3.expense.expense.model.*", "io.github.sardul3.ExpenseActivityTest"))
     threads.set(Runtime.getRuntime().availableProcessors())
     outputFormats.set(listOf("HTML", "XML"))
     mutationThreshold.set(80)
