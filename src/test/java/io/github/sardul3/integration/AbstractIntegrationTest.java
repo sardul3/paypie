@@ -2,19 +2,17 @@ package io.github.sardul3.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sardul3.expense.PayPieApplication;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -30,9 +28,15 @@ import java.io.InputStream;
 public abstract class AbstractIntegrationTest {
 
     @Container
-    @ServiceConnection
     protected static PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:15-alpine");
+
+    @DynamicPropertySource
+    static void registerDatasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @LocalServerPort
     protected int port;
@@ -42,18 +46,6 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @BeforeAll
-    static void beforeAll() {
-        // Disable Ryuk container to avoid connection issues
-        System.setProperty("testcontainers.reuse.enable", "true");
-        postgres.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-    }
 
     protected String getBaseUrl() {
         return "http://localhost:" + port;

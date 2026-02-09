@@ -5,6 +5,10 @@ import io.github.sardul3.expense.adapter.in.web.dto.CreateExpenseGroupRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.SettleUpRequest;
 import io.github.sardul3.expense.adapter.in.web.dto.ValidationErrorResponse;
 import io.github.sardul3.expense.application.dto.AddParticipantResponse;
+import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.model.ExpenseGroup;
+import io.github.sardul3.expense.domain.model.Participant;
+import io.github.sardul3.expense.domain.valueobject.GroupName;
 import io.github.sardul3.expense.application.dto.CreateExpenseGroupResponse;
 import io.github.sardul3.expense.application.dto.ExpenseGroupDetailResponse;
 import io.github.sardul3.expense.application.dto.ExpenseHistoryPageResponse;
@@ -21,14 +25,19 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @Tag("integration")
+@TestPropertySource(properties = "integration.context=web")
 class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private ExpenseGroupRepository repository;
 
     @Test
     void shouldCreateExpenseGroupSuccessfully() {
@@ -68,8 +77,13 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void shouldReturn404WhenGettingNonExistentGroup() {
-        ResponseEntity<ProblemDetail> response = restTemplate.getForEntity(
-                "/api/v1/expense/groups/00000000-0000-0000-0000-000000000000", ProblemDetail.class
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(java.util.List.of(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/problem+json")));
+        ResponseEntity<ProblemDetail> response = restTemplate.exchange(
+                "/api/v1/expense/groups/00000000-0000-0000-0000-000000000000",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                ProblemDetail.class
         );
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
@@ -87,8 +101,14 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // Second creation with same name: should fail with conflict
-        ResponseEntity<ProblemDetail> conflictResponse = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ProblemDetail.class
+        HttpHeaders conflictHeaders = new HttpHeaders();
+        conflictHeaders.setContentType(MediaType.APPLICATION_JSON);
+        conflictHeaders.setAccept(java.util.List.of(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/problem+json")));
+        ResponseEntity<ProblemDetail> conflictResponse = restTemplate.exchange(
+                "/api/v1/expense/groups",
+                HttpMethod.POST,
+                new HttpEntity<>(request, conflictHeaders),
+                ProblemDetail.class
         );
 
         assertThat(conflictResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
@@ -152,9 +172,11 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
     void shouldRejectTooLongGroupName() {
         String longName = "x".repeat(60);
         CreateExpenseGroupRequest request = new CreateExpenseGroupRequest(longName, "user@demo.com");
-
-        ResponseEntity<ProblemDetail> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups", request, ProblemDetail.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(java.util.List.of(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/problem+json")));
+        ResponseEntity<ProblemDetail> response = restTemplate.exchange(
+                "/api/v1/expense/groups", HttpMethod.POST, new HttpEntity<>(request, headers), ProblemDetail.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
@@ -229,8 +251,14 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
     void shouldReturn404WhenAddingParticipantToNonExistentGroup() {
         var groupId = java.util.UUID.randomUUID();
         AddParticipantRequest addRequest = new AddParticipantRequest("someone@example.com");
-        ResponseEntity<ProblemDetail> response = restTemplate.postForEntity(
-                "/api/v1/expense/groups/" + groupId + "/participants", addRequest, ProblemDetail.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(java.util.List.of(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/problem+json")));
+        ResponseEntity<ProblemDetail> response = restTemplate.exchange(
+                "/api/v1/expense/groups/" + groupId + "/participants",
+                HttpMethod.POST,
+                new HttpEntity<>(addRequest, headers),
+                ProblemDetail.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getStatus()).isEqualTo(404);
@@ -246,8 +274,14 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         var groupId = createResponse.getBody().id();
 
         AddParticipantRequest addRequest = new AddParticipantRequest("dup@example.com");
-        ResponseEntity<ProblemDetail> conflictResponse = restTemplate.postForEntity(
-                "/api/v1/expense/groups/" + groupId + "/participants", addRequest, ProblemDetail.class);
+        HttpHeaders conflictHeaders = new HttpHeaders();
+        conflictHeaders.setContentType(MediaType.APPLICATION_JSON);
+        conflictHeaders.setAccept(java.util.List.of(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/problem+json")));
+        ResponseEntity<ProblemDetail> conflictResponse = restTemplate.exchange(
+                "/api/v1/expense/groups/" + groupId + "/participants",
+                HttpMethod.POST,
+                new HttpEntity<>(addRequest, conflictHeaders),
+                ProblemDetail.class);
         assertThat(conflictResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(conflictResponse.getBody()).isNotNull();
         assertThat(conflictResponse.getBody().getStatus()).isEqualTo(409);
@@ -326,6 +360,76 @@ class ExpenseGroupIntegrationTest extends AbstractIntegrationTest {
         assertThat(historyResponse.getBody().content()).isEmpty();
         assertThat(historyResponse.getBody().totalElements()).isZero();
         assertThat(historyResponse.getBody().size()).isEqualTo(20);
+    }
+
+    @Test
+    void shouldSaveAndRetrieveAnExpenseGroup() {
+        ExpenseGroup group = ExpenseGroup.from(GroupName.withName("demo"), Participant.withEmail("a@b.com"));
+        ExpenseGroup saved = repository.save(group);
+        assertThat(saved).isNotNull();
+        assertThat(repository.existsByName(GroupName.withName("demo"))).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenGroupNameDoesNotExist() {
+        boolean exists = repository.existsByName(GroupName.withName("non-existent"));
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void dbContainerStarted() {
+        assertThat(postgres.isRunning()).isTrue();
+    }
+
+    @Test
+    void shouldCreateExpenseGroupWithValidJsonInput() throws Exception {
+        CreateExpenseGroupRequest request = loadTestDataFromJson(
+                "test-data/create-expense-group.json",
+                CreateExpenseGroupRequest.class);
+
+        ResponseEntity<CreateExpenseGroupResponse> response = performPost(
+                "/api/v1/expense/groups",
+                request,
+                CreateExpenseGroupResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().name()).isEqualTo(request.name());
+        assertThat(response.getBody().id()).isNotNull();
+        assertThat(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isNotNull();
+        assertThat(response.getHeaders().getFirst(HttpHeaders.LOCATION)).contains("/api/v1/expense/groups/");
+    }
+
+    @Test
+    void shouldThrowExceptionWithInvalidNameInput() throws Exception {
+        CreateExpenseGroupRequest request = loadTestDataFromJson(
+                "test-data/create-expense-group-invalid-name.json",
+                CreateExpenseGroupRequest.class);
+
+        ResponseEntity<ValidationErrorResponse> response = performPost(
+                "/api/v1/expense/groups",
+                request,
+                ValidationErrorResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void shouldThrowExceptionWithCorrectMessageForMissingField() throws Exception {
+        CreateExpenseGroupRequest request = loadTestDataFromJson(
+                "test-data/create-expense-group-missing-field-name.json",
+                CreateExpenseGroupRequest.class);
+
+        ResponseEntity<ValidationErrorResponse> response = performPost(
+                "/api/v1/expense/groups",
+                request,
+                ValidationErrorResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getBody().errors().get(0).field()).isEqualTo("name");
+        assertThat(response.getBody().errors().get(0).message()).isEqualTo("cannot be empty");
     }
 }
 
