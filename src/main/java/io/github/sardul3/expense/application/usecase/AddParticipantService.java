@@ -6,7 +6,9 @@ import io.github.sardul3.expense.application.dto.AddParticipantResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupNotFoundException;
 import io.github.sardul3.expense.application.exception.ParticipantAlreadyInGroupException;
 import io.github.sardul3.expense.application.port.in.AddParticipantUseCase;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.event.ParticipantAddedEvent;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 
@@ -20,9 +22,12 @@ import java.util.UUID;
 public class AddParticipantService implements AddParticipantUseCase {
 
     private final ExpenseGroupRepository expenseGroupRepository;
+    private final DomainEventPublisher domainEventPublisher;
 
-    public AddParticipantService(ExpenseGroupRepository expenseGroupRepository) {
+    public AddParticipantService(ExpenseGroupRepository expenseGroupRepository,
+                                DomainEventPublisher domainEventPublisher) {
         this.expenseGroupRepository = expenseGroupRepository;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     @Override
@@ -44,6 +49,11 @@ public class AddParticipantService implements AddParticipantUseCase {
         Participant newParticipant = Participant.withEmail(command.email());
         group.addParticipant(newParticipant);
         expenseGroupRepository.save(group);
+
+        domainEventPublisher.publish(new ParticipantAddedEvent(
+                groupId,
+                newParticipant.getParticipantId().getId(),
+                newParticipant.getEmail()));
 
         return new AddParticipantResponse(newParticipant.getParticipantId().getId(), newParticipant.getEmail());
     }

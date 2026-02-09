@@ -8,6 +8,7 @@ import io.github.sardul3.expense.application.port.in.GetGroupBalanceUseCase;
 import io.github.sardul3.expense.application.port.in.RetrieveAllExpenseGroupsUseCase;
 import io.github.sardul3.expense.application.port.in.RetrieveExpenseGroupUseCase;
 import io.github.sardul3.expense.application.port.in.SettleUpUseCase;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseActivityQueryRepository;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.application.usecase.AddParticipantService;
@@ -44,8 +45,9 @@ public class DomainBeanConfig {
     }
 
     @Bean
-    public AddParticipantUseCase addParticipantUseCase(ExpenseGroupRepository expenseGroupRepository) {
-        return new AddParticipantService(expenseGroupRepository);
+    public AddParticipantUseCase addParticipantUseCase(ExpenseGroupRepository expenseGroupRepository,
+                                                      DomainEventPublisher domainEventPublisher) {
+        return new AddParticipantService(expenseGroupRepository, domainEventPublisher);
     }
 
     @Bean

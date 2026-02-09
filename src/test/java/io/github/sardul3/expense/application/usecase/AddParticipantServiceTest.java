@@ -4,7 +4,9 @@ import io.github.sardul3.expense.application.dto.AddParticipantCommand;
 import io.github.sardul3.expense.application.dto.AddParticipantResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupNotFoundException;
 import io.github.sardul3.expense.application.exception.ParticipantAlreadyInGroupException;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.event.ParticipantAddedEvent;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
@@ -19,6 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,12 +29,14 @@ import static org.mockito.Mockito.when;
 class AddParticipantServiceTest {
 
     private ExpenseGroupRepository expenseGroupRepository;
+    private DomainEventPublisher domainEventPublisher;
     private AddParticipantService addParticipantService;
 
     @BeforeEach
     void setUp() {
         expenseGroupRepository = mock(ExpenseGroupRepository.class);
-        addParticipantService = new AddParticipantService(expenseGroupRepository);
+        domainEventPublisher = mock(DomainEventPublisher.class);
+        addParticipantService = new AddParticipantService(expenseGroupRepository, domainEventPublisher);
     }
 
     @Test
@@ -98,6 +103,25 @@ class AddParticipantServiceTest {
                 groupId,
                 new AddParticipantCommand("alice@example.com")))
                 .isInstanceOf(ParticipantAlreadyInGroupException.class);
+    }
+
+    @Test
+    @DisplayName("should publish ParticipantAddedEvent when participant is added")
+    void shouldPublishParticipantAddedEventWhenParticipantAdded() {
+        Participant creator = Participant.withEmail("alice@example.com");
+        ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), creator);
+        UUID groupId = group.getId().getId();
+
+        when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+        when(expenseGroupRepository.save(any(ExpenseGroup.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        addParticipantService.addParticipant(groupId, new AddParticipantCommand("bob@example.com"));
+
+        verify(domainEventPublisher).publish(argThat(event ->
+                event instanceof ParticipantAddedEvent e
+                        && e.groupId().equals(groupId)
+                        && e.email().equals("bob@example.com")
+                        && e.participantId() != null));
     }
 
     @Test
