@@ -8,6 +8,7 @@ import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -58,5 +59,17 @@ class GetGroupBalanceServiceTest {
         assertThatThrownBy(() -> getGroupBalanceService.getBalance(groupId))
                 .isInstanceOf(ExpenseGroupNotFoundException.class)
                 .hasMessageContaining("Expense group not found");
+    }
+
+    @Nested
+    @DisplayName("GetGroupBalance use case | Edge cases and validation")
+    class EdgeCasesAndValidation {
+
+        @Test
+        @DisplayName("When groupId is null, throw IllegalArgumentException or NPE rather than proceed")
+        void whenGroupIdIsNull_throwRatherThanProceed() {
+            assertThatThrownBy(() -> getGroupBalanceService.getBalance(null))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class));
+        }
     }
 }

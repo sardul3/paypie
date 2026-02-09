@@ -9,6 +9,7 @@ import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -65,5 +66,111 @@ class SettleUpServiceTest {
                 new SettleUpCommand(UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE)))
                 .isInstanceOf(ExpenseGroupNotFoundException.class)
                 .hasMessageContaining("Expense group not found");
+    }
+
+    @Nested
+    @DisplayName("SettleUp use case | Edge cases and validation")
+    class EdgeCasesAndValidation {
+
+        @Test
+        @DisplayName("When fromParticipantId is not in group, throw with message indicating payer not in group")
+        void whenPayerNotInGroup_throwWithClearMessage() {
+            Participant alice = Participant.withEmail("alice@example.com");
+            Participant bob = Participant.withEmail("bob@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+            group.addParticipant(bob);
+            UUID groupId = group.getId().getId();
+            UUID unknownPayerId = UUID.randomUUID();
+
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> settleUpService.settleUp(groupId,
+                    new SettleUpCommand(unknownPayerId, alice.getParticipantId().getId(), BigDecimal.TEN)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("not in group");
+        }
+
+        @Test
+        @DisplayName("When toParticipantId is not in group, throw with message indicating receiver not in group")
+        void whenReceiverNotInGroup_throwWithClearMessage() {
+            Participant alice = Participant.withEmail("alice@example.com");
+            Participant bob = Participant.withEmail("bob@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+            group.addParticipant(bob);
+            UUID groupId = group.getId().getId();
+            UUID unknownReceiverId = UUID.randomUUID();
+
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> settleUpService.settleUp(groupId,
+                    new SettleUpCommand(bob.getParticipantId().getId(), unknownReceiverId, BigDecimal.TEN)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("not in group");
+        }
+
+        @Test
+        @DisplayName("When amount is zero, throw IllegalArgumentException")
+        void whenAmountIsZero_throwIllegalArgumentException() {
+            Participant alice = Participant.withEmail("alice@example.com");
+            Participant bob = Participant.withEmail("bob@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+            group.addParticipant(bob);
+            UUID groupId = group.getId().getId();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> settleUpService.settleUp(groupId,
+                    new SettleUpCommand(bob.getParticipantId().getId(), alice.getParticipantId().getId(), BigDecimal.ZERO)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("positive");
+        }
+
+        @Test
+        @DisplayName("When amount is negative, throw IllegalArgumentException")
+        void whenAmountIsNegative_throwIllegalArgumentException() {
+            Participant alice = Participant.withEmail("alice@example.com");
+            Participant bob = Participant.withEmail("bob@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+            group.addParticipant(bob);
+            UUID groupId = group.getId().getId();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> settleUpService.settleUp(groupId,
+                    new SettleUpCommand(bob.getParticipantId().getId(), alice.getParticipantId().getId(), BigDecimal.valueOf(-5))))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("When from and to are the same participant, throw IllegalArgumentException")
+        void whenFromEqualsTo_throwIllegalArgumentException() {
+            Participant alice = Participant.withEmail("alice@example.com");
+            Participant bob = Participant.withEmail("bob@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+            group.addParticipant(bob);
+            UUID groupId = group.getId().getId();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> settleUpService.settleUp(groupId,
+                    new SettleUpCommand(alice.getParticipantId().getId(), alice.getParticipantId().getId(), BigDecimal.ONE)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("different participants");
+        }
+
+        @Test
+        @DisplayName("When groupId is null, throw IllegalArgumentException or NullPointerException with clear contract")
+        void whenGroupIdIsNull_throwRatherThanProceed() {
+            assertThatThrownBy(() -> settleUpService.settleUp(null,
+                    new SettleUpCommand(UUID.randomUUID(), UUID.randomUUID(), BigDecimal.ONE)))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class));
+        }
+
+        @Test
+        @DisplayName("When command is null, throw rather than NPE deep in call stack")
+        void whenCommandIsNull_throwRatherThanNPE() {
+            UUID groupId = UUID.randomUUID();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> settleUpService.settleUp(groupId, null))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class));
+        }
     }
 }

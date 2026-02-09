@@ -10,6 +10,7 @@ import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -26,6 +27,11 @@ public class AddParticipantService implements AddParticipantUseCase {
 
     @Override
     public AddParticipantResponse addParticipant(UUID groupId, AddParticipantCommand command) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("groupId cannot be null");
+        }
+        Objects.requireNonNull(command, "AddParticipantCommand cannot be null");
+
         ExpenseGroup group = expenseGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ExpenseGroupNotFoundException("Expense group not found: " + groupId));
 

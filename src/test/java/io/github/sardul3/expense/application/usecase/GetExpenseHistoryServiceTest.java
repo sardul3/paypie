@@ -10,6 +10,7 @@ import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -65,5 +66,60 @@ class GetExpenseHistoryServiceTest {
         assertThatThrownBy(() -> getExpenseHistoryService.getExpenseHistory(groupId, 0, 20))
                 .isInstanceOf(ExpenseGroupNotFoundException.class)
                 .hasMessageContaining("Expense group not found");
+    }
+
+    @Nested
+    @DisplayName("GetExpenseHistory use case | Edge cases and validation")
+    class EdgeCasesAndValidation {
+
+        @Test
+        @DisplayName("When page is negative, throw IllegalArgumentException")
+        void whenPageIsNegative_throwIllegalArgumentException() {
+            UUID groupId = UUID.randomUUID();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(ExpenseGroup.from(GroupName.withName("g"), Participant.withEmail("a@b.com"))));
+
+            assertThatThrownBy(() -> getExpenseHistoryService.getExpenseHistory(groupId, -1, 20))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("page");
+        }
+
+        @Test
+        @DisplayName("When size is zero, throw IllegalArgumentException")
+        void whenSizeIsZero_throwIllegalArgumentException() {
+            UUID groupId = UUID.randomUUID();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(ExpenseGroup.from(GroupName.withName("g"), Participant.withEmail("a@b.com"))));
+
+            assertThatThrownBy(() -> getExpenseHistoryService.getExpenseHistory(groupId, 0, 0))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("size");
+        }
+
+        @Test
+        @DisplayName("When size is negative, throw IllegalArgumentException")
+        void whenSizeIsNegative_throwIllegalArgumentException() {
+            UUID groupId = UUID.randomUUID();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(ExpenseGroup.from(GroupName.withName("g"), Participant.withEmail("a@b.com"))));
+
+            assertThatThrownBy(() -> getExpenseHistoryService.getExpenseHistory(groupId, 0, -5))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("When size exceeds maximum allowed, throw IllegalArgumentException")
+        void whenSizeExceedsMaximum_throwIllegalArgumentException() {
+            UUID groupId = UUID.randomUUID();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(ExpenseGroup.from(GroupName.withName("g"), Participant.withEmail("a@b.com"))));
+
+            assertThatThrownBy(() -> getExpenseHistoryService.getExpenseHistory(groupId, 0, 10_000))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("size");
+        }
+
+        @Test
+        @DisplayName("When groupId is null, throw rather than proceed")
+        void whenGroupIdIsNull_throwRatherThanProceed() {
+            assertThatThrownBy(() -> getExpenseHistoryService.getExpenseHistory(null, 0, 20))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class));
+        }
     }
 }

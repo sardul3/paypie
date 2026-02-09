@@ -10,6 +10,7 @@ import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -113,5 +114,52 @@ class AddParticipantServiceTest {
                 groupId,
                 new AddParticipantCommand("BOB@example.com")))
                 .isInstanceOf(ParticipantAlreadyInGroupException.class);
+    }
+
+    @Nested
+    @DisplayName("AddParticipant use case | Edge cases and validation")
+    class EdgeCasesAndValidation {
+
+        @Test
+        @DisplayName("When email in command is null, throw IllegalArgumentException with message about email")
+        void whenEmailIsNull_throwIllegalArgumentException() {
+            Participant creator = Participant.withEmail("alice@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), creator);
+            UUID groupId = group.getId().getId();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> addParticipantService.addParticipant(groupId, new AddParticipantCommand(null)))
+                    .isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("When email is blank, throw IllegalArgumentException")
+        void whenEmailIsBlank_throwIllegalArgumentException() {
+            Participant creator = Participant.withEmail("alice@example.com");
+            ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), creator);
+            UUID groupId = group.getId().getId();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+
+            assertThatThrownBy(() -> addParticipantService.addParticipant(groupId, new AddParticipantCommand("   ")))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("email");
+        }
+
+        @Test
+        @DisplayName("When groupId is null, throw rather than proceed")
+        void whenGroupIdIsNull_throwRatherThanProceed() {
+            assertThatThrownBy(() -> addParticipantService.addParticipant(null, new AddParticipantCommand("bob@example.com")))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class, ExpenseGroupNotFoundException.class));
+        }
+
+        @Test
+        @DisplayName("When command is null, throw rather than NPE in call stack")
+        void whenCommandIsNull_throwRatherThanNPE() {
+            UUID groupId = UUID.randomUUID();
+            when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> addParticipantService.addParticipant(groupId, null))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class));
+        }
     }
 }

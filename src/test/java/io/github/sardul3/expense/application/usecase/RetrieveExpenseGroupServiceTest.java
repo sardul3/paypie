@@ -9,6 +9,7 @@ import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -81,5 +82,17 @@ class RetrieveExpenseGroupServiceTest {
         assertThat(response.participants()).hasSize(2);
         assertThat(response.participants().stream().map(ParticipantBalanceView::email).toList())
                 .containsExactlyInAnyOrder("alice@example.com", "bob@example.com");
+    }
+
+    @Nested
+    @DisplayName("RetrieveExpenseGroup use case | Edge cases and validation")
+    class EdgeCasesAndValidation {
+
+        @Test
+        @DisplayName("When groupId is null, throw IllegalArgumentException or NPE rather than proceed")
+        void whenGroupIdIsNull_throwRatherThanProceed() {
+            assertThatThrownBy(() -> retrieveExpenseGroupService.getExpenseGroup(null))
+                    .satisfies(t -> assertThat(t).isInstanceOfAny(IllegalArgumentException.class, NullPointerException.class));
+        }
     }
 }

@@ -11,6 +11,7 @@ import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 import io.github.sardul3.expense.domain.valueobject.Settlement;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -27,6 +28,11 @@ public class SettleUpService implements SettleUpUseCase {
 
     @Override
     public SettleUpResponse settleUp(UUID groupId, SettleUpCommand command) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("groupId cannot be null");
+        }
+        Objects.requireNonNull(command, "SettleUpCommand cannot be null");
+
         ExpenseGroup group = expenseGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ExpenseGroupNotFoundException("Expense group not found: " + groupId));
 

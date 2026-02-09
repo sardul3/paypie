@@ -15,6 +15,9 @@ import java.util.UUID;
 @UseCase(description = "Returns paginated expense history for a group", inputPort = GetExpenseHistoryUseCase.class)
 public class GetExpenseHistoryService implements GetExpenseHistoryUseCase {
 
+    /** Maximum allowed page size for expense history queries. */
+    public static final int MAX_PAGE_SIZE = 500;
+
     private final ExpenseGroupRepository expenseGroupRepository;
     private final ExpenseActivityQueryRepository expenseActivityQueryRepository;
 
@@ -26,6 +29,19 @@ public class GetExpenseHistoryService implements GetExpenseHistoryUseCase {
 
     @Override
     public ExpenseHistoryPageResponse getExpenseHistory(UUID groupId, int page, int size) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("groupId cannot be null");
+        }
+        if (page < 0) {
+            throw new IllegalArgumentException("page cannot be negative");
+        }
+        if (size <= 0) {
+            throw new IllegalArgumentException("size must be positive");
+        }
+        if (size > MAX_PAGE_SIZE) {
+            throw new IllegalArgumentException("size cannot exceed " + MAX_PAGE_SIZE);
+        }
+
         expenseGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ExpenseGroupNotFoundException("Expense group not found: " + groupId));
         return expenseActivityQueryRepository.findByGroupId(groupId, page, size);

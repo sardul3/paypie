@@ -13,6 +13,7 @@ import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -29,10 +30,12 @@ public class CreateExpenseActivityService implements CreateExpenseActivityUseCas
 
     @Override
     public CreateExpenseActivityResponse createExpenseActivity(CreateExpenseActivityCommand command) {
-        var expenseGroup = expenseGroupRepository.findById(command.groupId())
-                .orElseThrow(() -> new ExpenseGroupNotFoundException("Expense Group not found"));
+        Objects.requireNonNull(command, "CreateExpenseActivityCommand cannot be null");
+        var groupId = command.groupId();
+        var expenseGroup = expenseGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ExpenseGroupNotFoundException("Expense group not found: " + groupId));
 
-        var paidBy = expenseGroup.getParticipantById(ParticipantId.from( command.paidBy() ))
+        var paidBy = expenseGroup.getParticipantById(ParticipantId.from(command.paidBy()))
                 .orElseThrow(() -> new ParticipantNotFoundInGroupException("Participant not found"));
 
         ExpenseActivity activity;
@@ -40,6 +43,12 @@ public class CreateExpenseActivityService implements CreateExpenseActivityUseCas
             List<ParticipantId> customSplit = command.splitWith().stream()
                     .map(ParticipantId::from)
                     .collect(Collectors.toList());
+            for (ParticipantId splitId : customSplit) {
+                if (expenseGroup.getParticipantById(splitId).isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "Split participant " + splitId.getId() + " is not a member of the group");
+                }
+            }
             ExpenseSplit split = ExpenseSplit.customSplitWithPayerIncluded(customSplit, paidBy.getParticipantId());
             activity = ExpenseActivity.from(command.description(), Money.of(command.amount()), paidBy, split);
         } else {

@@ -26,6 +26,9 @@ public class GetGroupBalanceService implements GetGroupBalanceUseCase {
 
     @Override
     public GroupBalanceResponse getBalance(UUID groupId) {
+        if (groupId == null) {
+            throw new IllegalArgumentException("groupId cannot be null");
+        }
         ExpenseGroup group = expenseGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ExpenseGroupNotFoundException("Expense group not found: " + groupId));
 
