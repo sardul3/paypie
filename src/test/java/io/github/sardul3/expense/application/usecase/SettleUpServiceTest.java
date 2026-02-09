@@ -3,7 +3,9 @@ package io.github.sardul3.expense.application.usecase;
 import io.github.sardul3.expense.application.dto.SettleUpCommand;
 import io.github.sardul3.expense.application.dto.SettleUpResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupNotFoundException;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.event.SettlementCompletedEvent;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
@@ -19,6 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,12 +29,14 @@ import static org.mockito.Mockito.when;
 class SettleUpServiceTest {
 
     private ExpenseGroupRepository expenseGroupRepository;
+    private DomainEventPublisher domainEventPublisher;
     private SettleUpService settleUpService;
 
     @BeforeEach
     void setUp() {
         expenseGroupRepository = mock(ExpenseGroupRepository.class);
-        settleUpService = new SettleUpService(expenseGroupRepository);
+        domainEventPublisher = mock(DomainEventPublisher.class);
+        settleUpService = new SettleUpService(expenseGroupRepository, domainEventPublisher);
     }
 
     @Test
@@ -54,6 +59,29 @@ class SettleUpServiceTest {
         // Payer (bob) is credited, receiver (alice) is debited
         assertThat(bob.getBalance()).isEqualByComparingTo(BigDecimal.TEN);
         assertThat(alice.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(-10));
+    }
+
+    @Test
+    @DisplayName("should publish SettlementCompletedEvent when settlement recorded")
+    void shouldPublishSettlementCompletedEventWhenSettlementRecorded() {
+        Participant alice = Participant.withEmail("alice@example.com");
+        Participant bob = Participant.withEmail("bob@example.com");
+        ExpenseGroup group = ExpenseGroup.from(GroupName.withName("trip"), alice);
+        group.addParticipant(bob);
+        UUID groupId = group.getId().getId();
+
+        when(expenseGroupRepository.findById(groupId)).thenReturn(Optional.of(group));
+        when(expenseGroupRepository.save(any(ExpenseGroup.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        settleUpService.settleUp(groupId,
+                new SettleUpCommand(bob.getParticipantId().getId(), alice.getParticipantId().getId(), BigDecimal.TEN));
+
+        verify(domainEventPublisher).publish(argThat(event ->
+                event instanceof SettlementCompletedEvent e
+                        && e.groupId().equals(groupId)
+                        && e.fromParticipantId().equals(bob.getParticipantId().getId())
+                        && e.toParticipantId().equals(alice.getParticipantId().getId())
+                        && e.amount().compareTo(BigDecimal.TEN) == 0));
     }
 
     @Test

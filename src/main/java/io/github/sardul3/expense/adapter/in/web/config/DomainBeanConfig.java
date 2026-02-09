@@ -57,8 +57,9 @@ public class DomainBeanConfig {
     }
 
     @Bean
-    public SettleUpUseCase settleUpUseCase(ExpenseGroupRepository expenseGroupRepository) {
-        return new SettleUpService(expenseGroupRepository);
+    public SettleUpUseCase settleUpUseCase(ExpenseGroupRepository expenseGroupRepository,
+                                           DomainEventPublisher domainEventPublisher) {
+        return new SettleUpService(expenseGroupRepository, domainEventPublisher);
     }
 
     @Bean

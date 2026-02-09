@@ -5,7 +5,9 @@ import io.github.sardul3.expense.application.dto.SettleUpCommand;
 import io.github.sardul3.expense.application.dto.SettleUpResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupNotFoundException;
 import io.github.sardul3.expense.application.port.in.SettleUpUseCase;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.event.SettlementCompletedEvent;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.valueobject.Money;
 import io.github.sardul3.expense.domain.valueobject.ParticipantId;
@@ -21,9 +23,12 @@ import java.util.UUID;
 public class SettleUpService implements SettleUpUseCase {
 
     private final ExpenseGroupRepository expenseGroupRepository;
+    private final DomainEventPublisher domainEventPublisher;
 
-    public SettleUpService(ExpenseGroupRepository expenseGroupRepository) {
+    public SettleUpService(ExpenseGroupRepository expenseGroupRepository,
+                           DomainEventPublisher domainEventPublisher) {
         this.expenseGroupRepository = expenseGroupRepository;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     @Override
@@ -43,6 +48,12 @@ public class SettleUpService implements SettleUpUseCase {
         );
         group.settle(settlement);
         expenseGroupRepository.save(group);
+
+        domainEventPublisher.publish(new SettlementCompletedEvent(
+                groupId,
+                command.fromParticipantId(),
+                command.toParticipantId(),
+                command.amount()));
 
         return new SettleUpResponse(groupId);
     }
