@@ -6,7 +6,9 @@ import io.github.sardul3.expense.application.dto.CreateExpenseActivityResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupNotFoundException;
 import io.github.sardul3.expense.application.exception.ParticipantNotFoundInGroupException;
 import io.github.sardul3.expense.application.port.in.CreateExpenseActivityUseCase;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.event.ExpenseAddedEvent;
 import io.github.sardul3.expense.domain.model.ExpenseActivity;
 import io.github.sardul3.expense.domain.valueobject.ExpenseSplit;
 import io.github.sardul3.expense.domain.valueobject.Money;
@@ -23,9 +25,12 @@ import java.util.stream.Collectors;
 public class CreateExpenseActivityService implements CreateExpenseActivityUseCase {
 
     private final ExpenseGroupRepository expenseGroupRepository;
+    private final DomainEventPublisher domainEventPublisher;
 
-    public CreateExpenseActivityService(ExpenseGroupRepository expenseGroupRepository) {
+    public CreateExpenseActivityService(ExpenseGroupRepository expenseGroupRepository,
+                                        DomainEventPublisher domainEventPublisher) {
         this.expenseGroupRepository = expenseGroupRepository;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     @Override
@@ -57,6 +62,12 @@ public class CreateExpenseActivityService implements CreateExpenseActivityUseCas
 
         expenseGroup.addActivity(activity);
         expenseGroupRepository.save(expenseGroup);
+
+        domainEventPublisher.publish(new ExpenseAddedEvent(
+                groupId,
+                activity.getDescription(),
+                activity.getAmount().getAmount(),
+                paidBy.getParticipantId().getId()));
 
         return new CreateExpenseActivityResponse(
                 activity.getDescription(),

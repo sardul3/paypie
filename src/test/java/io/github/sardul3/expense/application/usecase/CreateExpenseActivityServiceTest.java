@@ -4,7 +4,9 @@ import io.github.sardul3.expense.application.dto.CreateExpenseActivityCommand;
 import io.github.sardul3.expense.application.dto.CreateExpenseActivityResponse;
 import io.github.sardul3.expense.application.exception.ExpenseGroupNotFoundException;
 import io.github.sardul3.expense.application.exception.ParticipantNotFoundInGroupException;
+import io.github.sardul3.expense.application.port.out.DomainEventPublisher;
 import io.github.sardul3.expense.application.port.out.ExpenseGroupRepository;
+import io.github.sardul3.expense.domain.event.ExpenseAddedEvent;
 import io.github.sardul3.expense.domain.model.ExpenseGroup;
 import io.github.sardul3.expense.domain.model.Participant;
 import io.github.sardul3.expense.domain.valueobject.GroupName;
@@ -21,12 +23,15 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CreateExpenseActivityServiceTest {
 
     private ExpenseGroupRepository expenseGroupRepository;
+    private DomainEventPublisher domainEventPublisher;
     private CreateExpenseActivityService service;
 
     ExpenseGroup expenseGroup;
@@ -36,7 +41,8 @@ class CreateExpenseActivityServiceTest {
     @BeforeEach
     void setUp() {
         expenseGroupRepository = mock(ExpenseGroupRepository.class);
-        service = new CreateExpenseActivityService(expenseGroupRepository);
+        domainEventPublisher = mock(DomainEventPublisher.class);
+        service = new CreateExpenseActivityService(expenseGroupRepository, domainEventPublisher);
 
         groupCreator = Participant.withEmail("test@example.com");
         expenseGroup = ExpenseGroup.from(GroupName.withName("apt-group"), groupCreator);
@@ -72,6 +78,27 @@ class CreateExpenseActivityServiceTest {
                 .extracting(Participant::getBalance)
                 .isEqualTo(BigDecimal.valueOf(-7500, 2));
 
+    }
+
+    @Test
+    @DisplayName("should publish ExpenseAddedEvent when expense activity is created")
+    void shouldPublishExpenseAddedEventWhenActivityCreated() {
+        when(expenseGroupRepository.findById(any())).thenReturn(Optional.of(expenseGroup));
+        CreateExpenseActivityCommand command = new CreateExpenseActivityCommand(
+                expenseGroup.getId().getId(),
+                "Lunch",
+                BigDecimal.valueOf(50),
+                groupCreator.getParticipantId().getId(),
+                null);
+
+        service.createExpenseActivity(command);
+
+        verify(domainEventPublisher).publish(argThat(event ->
+                event instanceof ExpenseAddedEvent e
+                        && e.groupId().equals(expenseGroup.getId().getId())
+                        && e.description().equals("Lunch")
+                        && e.amount().compareTo(BigDecimal.valueOf(50)) == 0
+                        && e.paidByParticipantId().equals(groupCreator.getParticipantId().getId())));
     }
 
     @Test

@@ -35,8 +35,9 @@ public class DomainBeanConfig {
     }
 
     @Bean
-    public CreateExpenseActivityUseCase createExpenseActivityUseCase(ExpenseGroupRepository expenseGroupRepository) {
-        return new CreateExpenseActivityService(expenseGroupRepository);
+    public CreateExpenseActivityUseCase createExpenseActivityUseCase(ExpenseGroupRepository expenseGroupRepository,
+                                                                     DomainEventPublisher domainEventPublisher) {
+        return new CreateExpenseActivityService(expenseGroupRepository, domainEventPublisher);
     }
 
     @Bean
